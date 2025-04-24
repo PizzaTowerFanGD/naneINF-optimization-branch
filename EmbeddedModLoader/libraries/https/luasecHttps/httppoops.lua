@@ -1,0 +1,1 @@
+return {}--require("EmbeddedModLoader/libraries/https/https")

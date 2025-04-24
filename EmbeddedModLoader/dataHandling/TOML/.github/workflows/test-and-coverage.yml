@@ -1,0 +1,51 @@
+name: Run Tests and Code Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:  
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lua: [lua=5.1, lua=5.2, lua=5.3, lua=5.4, luajit=2.0, luajit=@v2.1]
+    steps:
+      - name: Fail on Draft PRs
+        if: github.event.pull_request.draft == true
+        run: exit 1
+    
+      # Checks-out the repository under $GITHUB_WORKSPACE.
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.19'
+
+      - name: Install Lua (${{ matrix.lua }})
+        run: |
+          pip install hererocks
+          hererocks -r^ --${{ matrix.lua }} lua_install
+          echo lua_install/bin >> $GITHUB_PATH
+
+      - name: Install toml-test
+        run: go install github.com/toml-lang/toml-test/cmd/toml-test@v1.5.0
+    
+      - name: install depedencies
+        run: |
+          luarocks install lua-cjson
+          luarocks install luacov
+          luarocks install luacov-coveralls
+          
+      - name: run toml-test with coverage
+        continue-on-error: true
+        run: |
+          toml-test -parallel 1 -- lua_install/bin/lua -lluacov spec/toml-test.lua
+          
+      - name: Report test coverage
+        if: success()
+        continue-on-error: true
+        run: luacov-coveralls -e .luarocks
+        env:
+          COVERALLS_REPO_TOKEN: ${{ github.token }}
+
