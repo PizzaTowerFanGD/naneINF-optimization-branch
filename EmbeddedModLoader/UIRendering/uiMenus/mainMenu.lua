@@ -23,6 +23,7 @@ local https = {
 local sounds = {}
 
 function playSFX(name, volume, useCache)
+    print(name)
     local sound = not useCache and sounds[name]  or love.audio.newSource(assets[name], 'static')
     sound:setVolume(volume or 0.65)
     sound:play()

@@ -56,8 +56,10 @@ function methods.require(path)
         chunk, error_ = load(luaFile.getSource(), path)()
     end)
 
+
+
     if not succ then
-        forcePrint("Error loading: " .. path .. ", Fallback to default script.")
+        forcePrint("Error loading: " .. tostring(path) .. ", Fallback to default script.")
         forcePrint("Reason: " .. err .. "  " .. tostring(error_))
         forcePrint(error_)
         forcePrint(err)

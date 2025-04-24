@@ -5,6 +5,8 @@ love.filesystem.setCRequirePath(
         love.filesystem.getCRequirePath() .. ';?.so'
 )
 
+print(love.filesystem.getSaveDirectory())
+
 --local succ, func = ffi.load('ssl')
 --print(succ, func)
 --require('ssl')
@@ -53,7 +55,7 @@ function writeToFile(...)
 
     if not _G.MenuSettings then return end
     if _G.MenuSettings.WriteToLogs.Value then
-        love.filesystem.write("patched/logs.txt", love.filesystem.read("patched/logs.txt") .. "\n" .. tostring(v1))
+        love.filesystem.write("patched/logs.txt", tostring(love.filesystem.read("patched/logs.txt") or "") .. "\n" .. tostring(v1))
     end
 end
 
