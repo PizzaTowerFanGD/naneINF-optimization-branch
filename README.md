@@ -1,4 +1,4 @@
-# ***nan*einf Balatro ModLoader**
+# ***nan*einf Balatro ModLoader Pre-Alpha**
 An embedded modloader for Balatro without the need for Lovely or Steammodded, with an easy installation process!
 
 ## **Supports PC, iOS, and Android—no jailbreak required!**
