@@ -19,7 +19,7 @@ Mod downloads via GitHub links or local mod folder (https folder)
 ## **Installation**
 
 - [Click here for PC installation instructions](https://abc.xyz)
-- [Click here for Mobile installation instructions]([https://abc.xyz](https://github.com/3XPLwastaken/naneINF-Balatro-Modloader/blob/main/InstalInstructions/iOS_BMM_Installation.md))
+- [Click here for Mobile installation instructions](https://github.com/3XPLwastaken/naneINF-Balatro-Modloader/blob/main/InstalInstructions/iOS_BMM_Installation.md)
 
 ---
 
