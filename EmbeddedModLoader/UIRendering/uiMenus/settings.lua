@@ -89,11 +89,12 @@ local defaultSettings = {
         Value = true
     },
 
-    LoadUsingMultiThreading = {
+    -- no longer in use as LoadUsingMultiThreading is now forced
+    --[[LoadUsingMultiThreading = {
         Name = "Load Using Multi-Threading [WIP]",
         Category = "Optimization",
         Value = true
-    },
+    },]]
 
     DisplayDebugInjectionInfo = {
         Name = "Display Debug Injection Info [NW]",
@@ -102,7 +103,7 @@ local defaultSettings = {
     },
 
     WriteToLogs = {
-        Name = "Write To Logs File patched/logs.txt (in save directory)",
+        Name = "Write To Logs File patched/logs.txt (in save directory) WILL CAUSE MAJOR PERFORMANCE HITS",
         Category = "Debug",
         Value = false
     },
