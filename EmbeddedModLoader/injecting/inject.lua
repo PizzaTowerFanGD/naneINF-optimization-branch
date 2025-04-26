@@ -292,12 +292,25 @@ if target == 'functions/common_events.lua' or target == 'functions/common_events
     forcePrint("----------------------------------------------------")
 end
 
-
--- micro optimization
+function rename(from, to)
+    love.filesystem.write(to, love.filesystem.read(from))
+    love.filesystem.remove(from)
+end
 
 local overwrite = false
 if target == 'main' or target == 'main.lua' then
     overwrite = true
+
+    -- if originalmain.lua is not present, we will create it automatically.
+
+    if not love.filesystem.getInfo("originalmain.lua") then
+        rename("main.lua", "TEMP.lua")
+
+        love.filesystem.write("originalmain.lua", love.filesystem.read("main.lua"))
+
+        rename("TEMP.lua", "main.lua")
+    end
+
 end
 
 
