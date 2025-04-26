@@ -457,10 +457,12 @@ love.thread.getChannel(channelName):push({
         end
 
         -- write the entire log queue to file.
-        writeToFile(currentLogQueue)
 
         updateScreen()
     end
+
+
+    writeToFile(currentLogQueue)
 end
 
 
