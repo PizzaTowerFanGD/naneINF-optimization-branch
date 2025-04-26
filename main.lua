@@ -1,22 +1,22 @@
 -- the new system makes everything easier when it comes to installing themod loader
-
--- start internal UI
-love.filesystem.setCRequirePath(
+--[[love.filesystem.setCRequirePath(
         love.filesystem.getCRequirePath() .. ';?.so'
 )
-
 print(love.filesystem.getSaveDirectory())
-
 --local succ, func = ffi.load('ssl')
 --print(succ, func)
---require('ssl')
+--require('ssl')]]
+
+love.filesystem.write("patched/PreLaunch-logs.txt", "")
+love.filesystem.write("patched/PostLaunch-logs.txt", "")
 
 -- makes my life easier
 local path = "EmbeddedModLoader/"
+local menuPaths = 'EmbeddedModLoader/UIRendering/uiMenus/' -- menus paths
+
 function rgb(r,g,b,a)
     return r/255, g/255, b/255, (a and a/255 or 1)
 end
-
 
 --require('ssl')
 
@@ -31,31 +31,25 @@ function toDeg(rad)
     return rad * math.pi/180
 end
 
+-- start internal UI
 -- assets
 assets = require(path .. "UIRendering/assets")
 library = require(path .. 'UIRendering/uiLibrary')
-
--- menus paths
-local menuPaths = 'EmbeddedModLoader/UIRendering/uiMenus/'
-
 library.load()
 
 -- DEBUG
 local currentOS = love.system.getOS()
-_G.MobileBehavior = currentOS == 'iOS' or currentOS == 'Android' or true --[[debug, disable once mobile is confirmed to work.]]
 
+_G.CurrentLog = "PreLaunch-"
+_G.MobileBehavior = currentOS == 'iOS' or currentOS == 'Android' or true --[[debug, disable once mobile is confirmed to work.]]
 
 function writeToFile(...)
     local v = {...}
     local v1 = v[1]
 
-    --[[if love.filesystem.getInfo("patched/logs.txt") == nil then
-        love.filesystem.write("patched/logs.txt", love.filesystem.read("patched/logs.txt") .. "\n" .. v1)
-    end]]
-
     if not _G.MenuSettings then return end
     if _G.MenuSettings.WriteToLogs.Value then
-        love.filesystem.write("patched/logs.txt", tostring(love.filesystem.read("patched/logs.txt") or "") .. "\n" .. tostring(v1))
+        love.filesystem.write("patched/".. _G.CurrentLog .. "logs.txt", love.filesystem.read("patched/".. _G.CurrentLog .. "logs.txt") .. "\n" .. tostring(v1))
     end
 end
 
@@ -141,13 +135,10 @@ function _G.LoadGame()
     -- enable the ui's before injecting
     require(menuPaths .. 'loadingGame').screen.visible = true
 
-
-
+    -- setup the fake requiring system to load our fake files
 
     oldRequire = require
-
     faker = require("EmbeddedModLoader/files/fakeLuaFile")
-
     fakeRequireMethods = require("EmbeddedModLoader/files/requireFakeFiles")
 
     -- some really weird issue randomly started happening so im not having any chances of a double module load
@@ -157,7 +148,8 @@ function _G.LoadGame()
     _G.require = fakeRequireMethods.require
 
 
-    if _G.MenuSettings.ModsEnabled.Value then
+    -- inject if we have mods enabled
+    if _G.MenuSettings.ModsEnabled.Value == true then
         modDiscovery = require("EmbeddedModLoader/files/modDiscovery")
         luavely = require("EmbeddedModLoader/injecting/luavely")
 
@@ -171,6 +163,8 @@ function _G.LoadGame()
     for i, v in ipairs(_G.malleoMusicOmg) do
         v:stop()
     end
+
+    _G.CurrentLog = "PostLaunch-"
 
     local superRun = require("originalmain")
     love.run()
