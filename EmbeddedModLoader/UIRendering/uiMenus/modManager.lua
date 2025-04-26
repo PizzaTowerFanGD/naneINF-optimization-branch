@@ -89,9 +89,23 @@ function mainMenu:setup(library)
     library.defaultParent = self.screen
 
     -- version
-    library:addNormalText('Files Manager', {
+    library:addNormalText('Mods Manager', {
         x = toScaleFromPixels(25, 1920),
         y = toScaleFromPixels(25, 1080),
+
+        width = 1,
+        height = 1,
+
+        bgColor = {1, 1, 1},
+
+        anchorPointY = 0,
+        anchorPointX = 0,
+    })
+
+
+    library:addText('This page is unfinished, and currently does not attempt to display any installed mods.', {
+        x = 0,
+        y = 0,
 
         width = 1,
         height = 1,
