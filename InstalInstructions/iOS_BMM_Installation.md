@@ -1,7 +1,8 @@
 # naneINF Mobile Installation (iOS)
 This set of instructions is for installation of the modloader on ios devices,
 
-For installation on android devices, [Refer to this tutorial](https://a.com/)
+For installation on android devices, ~~[Refer to this tutorial](https://a.com/)~~
+##Android is supported, but does not have installation instructions yet.
 
 For installation on PC, [Refer to this tutorial](https://a.com/)
 

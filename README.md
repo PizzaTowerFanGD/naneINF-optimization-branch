@@ -1,4 +1,4 @@
-# ***nan*einf Balatro ModLoader**
+# ***nan*einf Balatro ModLoader Pre-Alpha**
 An embedded modloader for Balatro without the need for Lovely or Steammodded, with an easy installation process!
 
 ## **Supports PC, iOS, and Android—no jailbreak required!**
@@ -19,7 +19,7 @@ Mod downloads via GitHub links or local mod folder (https folder)
 ## **Installation**
 
 - [Click here for PC installation instructions](https://abc.xyz)
-- [Click here for Mobile installation instructions](https://abc.xyz)
+- [Click here for Mobile installation instructions](https://github.com/3XPLwastaken/naneINF-Balatro-Modloader/blob/main/InstalInstructions/iOS_BMM_Installation.md)
 
 ---
 
