@@ -38,7 +38,7 @@ function print(...)
 end
 
 --[[function writeToFile(...)
-local v = {...}
+    local v = {...}
     local v1 = v[1]
 
     --[[if love.filesystem.getInfo("patched/logs.txt") == nil then

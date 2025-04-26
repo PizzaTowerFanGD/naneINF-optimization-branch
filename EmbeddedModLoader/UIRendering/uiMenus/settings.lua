@@ -223,7 +223,6 @@ function mainMenu:setup(library)
             v.Value = not v.Value
 
             boolButton.setValue(v.Value)
-
             --_G.MenuSettings[i].Value = v.Value
 
             playSFX("toggle", nil, true)

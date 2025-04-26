@@ -247,7 +247,14 @@ function writeToFile(...)
         return
     end
 
-    love.filesystem.write("patched/logs.txt", tostring(love.filesystem.read("patched/logs.txt")) .. "\n" .. tostring(v1))
+    -- fix for missing logs
+    love.thread.getChannel(channelName):push({
+        inc = completed,
+        cmd = "log",
+        data = {v1}
+    })
+
+    --love.filesystem.write("patched/PreLaunch-logs.txt", love.filesystem.read("patched/PreLaunch-logs.txt") .. "\n" .. tostring(v1))
 end
 
 -- forces a print
@@ -260,9 +267,9 @@ function forcePrint(str)
         return
     end
 
+    writeToFile(str)
     io.write(str .. '\n')
     io.flush()  -- Ensures it prints immediately
-    writeToFile(str)
 end
 
 forcePrint("THE TARGET: " .. tostring(target))
@@ -353,6 +360,7 @@ love.thread.getChannel(channelName):push({
     local threads = {}
     local finishedThreads = {}
     local threadCompletions = {}
+    local currentLogQueue = [[]]
 
     -- start threads
     for fileName, filePatches in pairs(sortedTomls) do
@@ -423,6 +431,9 @@ love.thread.getChannel(channelName):push({
 
                     file.setSource(data[2])
                     file.dump() -- saves to the disk
+
+                elseif cmd == 'log' then
+                    currentLogQueue = currentLogQueue .. data[1] .. '\n'
                 end
             end
         end
@@ -431,6 +442,9 @@ love.thread.getChannel(channelName):push({
         for i, v in pairs(threadCompletions) do
             _G.finishedInjecting = _G.finishedInjecting + v
         end
+
+        -- write the entire log queue to file.
+        writeToFile(currentLogQueue)
 
         updateScreen()
     end
