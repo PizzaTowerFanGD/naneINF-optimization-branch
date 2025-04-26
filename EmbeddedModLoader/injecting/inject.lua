@@ -298,7 +298,7 @@ function rename(from, to)
 end
 
 local overwrite = false
-if target == 'main' or target == 'main.lua' then
+if target == 'main' or target == 'main.lua' or target == 'originalmain.lua' then
     overwrite = true
 
     -- if originalmain.lua is not present, we will create it automatically.
