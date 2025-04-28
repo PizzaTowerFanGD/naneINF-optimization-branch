@@ -166,7 +166,7 @@ end
 -- originally i checked EVERY SINGLE CHARACTER, but thankfully we dont need to do that anymore yipe!!!
 
 
-local function match(lines, times, patternLines)
+local function match(lines, times, patternLines, tag)
     local currentLine = 1
     local matches = {}
 
@@ -183,7 +183,7 @@ local function match(lines, times, patternLines)
         end
 
         -- was not a match with wildcard or regular :(
-        if not compareStrings(patternLine, line[2]) then
+        if not compareStrings(patternLine, line[2], tag) then
             --print('fail')
             currentLine = 1
             goto matchingContinue
