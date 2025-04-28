@@ -102,8 +102,12 @@ local function linesTrimmed(patch, keepTabs)
 end
 
 
+-- debug log config
+local logIfPercentageFound = 0.5
+
+
 -- i would just normally do ==, but wildcards make this necessary.
-local function compareStrings(pattern, line)
+local function compareStrings(pattern, line, hasTag)
     --print(pattern, line)
 
     -- optimization
@@ -112,6 +116,11 @@ local function compareStrings(pattern, line)
     if pattern == '' then return true end
     if patternLength ~= #line and string.sub(pattern, patternLength, patternLength) ~= '*' then
         -- no chance to match.
+        if hasTag then
+            forcePrint("-----------------------------\n[LUAVELY]: PATTERN TAG DBG, PATTERN: " .. pattern .. " :: WITH TAG " .. hasTag .. ":: HAS NO CHANCE TO MATCH.\n" ..
+                    "LENGTH OF PATTERN: " .. patternLength .. "   LENGTH OF LINE: " .. #line .. "\n\n")
+        end
+
         return false
     end
 
@@ -131,6 +140,13 @@ local function compareStrings(pattern, line)
         local lineChr = string.sub(line, i, i)
 
         if patternChr ~= lineChr then
+            if hasTag and i/patternLength >= logIfPercentageFound then
+                forcePrint("-----------------------------\n" ..
+                        "[LUAVELY]: PATTERN TAG DBG, LETTER MISMATCH ON: " .. pattern .. " :: WITH TAG " .. hasTag .. ":: ON INDEX " .. i .. "/" .. patternLength .. "\n"
+                .. "FOUND: " .. lineChr .. ",    LOOKING FOR: " .. patternChr .. "\n\n"
+                )
+            end
+
             return false
         end
 
