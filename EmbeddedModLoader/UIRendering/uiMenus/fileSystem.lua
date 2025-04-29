@@ -417,7 +417,7 @@ function updateFilesList()
                 selectedFiles[filePath] = not isSelected
 
                 -- double click to open folder
-                if os.clock() - self.lastClick < (onPC and 0.5 or 1) and selectedCount <= 1 then
+                if os.clock() - self.lastClick < (onPC and 0.2 or 0.4) and selectedCount <= 1 then
                     if controlDown and onPC then return end
                     openFolder(fileName)
                 end
