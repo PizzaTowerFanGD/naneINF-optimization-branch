@@ -35,6 +35,7 @@ end
 -- assets
 assets = require(path .. "UIRendering/assets")
 library = require(path .. 'UIRendering/uiLibrary')
+reinject = require(path .. 'injecting/autoDetermineReinjection')
 library.load()
 
 -- DEBUG
@@ -130,6 +131,10 @@ function _G.LoadGame()
     if started then
         print("Already injecting!") -- debounce
         return
+    end
+
+    if _G.MenuSettings.LoadUsingIndexedFiles.Value then
+        _G.MenuSettings.LoadUsingIndexedFiles.Value = not reinject.determineReinjection()
     end
 
     -- enable the ui's before injecting
