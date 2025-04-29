@@ -103,7 +103,7 @@ end
 
 
 -- debug log config
-local logIfPercentageFound = 0.5
+local logIfPercentageFound = 0.8
 
 
 -- i would just normally do ==, but wildcards make this necessary.
@@ -113,10 +113,15 @@ local function compareStrings(pattern, line, hasTag)
     -- optimization
     local patternLength = #pattern
 
+    -- patternLength ~= #line - 1
+    -- has been added because BMM accidentally adds 1 to the length of each line, causing the
+    -- mod loader optimization to never attempt to check the line.
+    -- willsonthewolf gave a good potential cause here: https://discord.com/channels/1288906099180699658/1324835018299670558/1366571833914294324 (this is in the offical lovely server)
+
     if pattern == '' then return true end
-    if patternLength ~= #line and string.sub(pattern, patternLength, patternLength) ~= '*' then
+    if patternLength ~= #line and patternLength ~= #line - 1 and string.sub(pattern, patternLength, patternLength) ~= '*' then
         -- no chance to match.
-        if hasTag then
+        if hasTag and patternLength/#line >= logIfPercentageFound then
             forcePrint("-----------------------------\n[LUAVELY]: PATTERN TAG DBG, PATTERN: " .. pattern .. " :: WITH TAG " .. hasTag .. ":: HAS NO CHANCE TO MATCH.\n" ..
                     "LENGTH OF PATTERN: " .. patternLength .. "   LENGTH OF LINE: " .. #line .. "\n\n")
         end
@@ -156,7 +161,7 @@ local function compareStrings(pattern, line, hasTag)
     -- successfully matched?
     -- TODO investigate posibility to move so it can be a heavy optimization
 
-    return patternLength == #line--true
+    return true -- patternLength == #line
 end
 
 
