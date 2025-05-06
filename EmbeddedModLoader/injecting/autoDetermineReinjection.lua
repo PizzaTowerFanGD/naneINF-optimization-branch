@@ -90,7 +90,7 @@ end
 
 -- // [[
 function module.determineReinjection()
-    if not love.filesystem.getInfo(modsListCachePath) then
+    if not love.filesystem.getInfo(modsListCachePath) or not _G.MenuSettings.OverwriteAutoReinjection.Value then
         writeNewestChanges(collectMods())
         return true
     end

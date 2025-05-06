@@ -114,6 +114,12 @@ local defaultSettings = {
         Value = true
     },
 
+    OverwriteAutoReinjection = {
+        Name = "Determine Reinjection Automatically",
+        Category = "Optimization",
+        Value = true,
+    },
+
     ModsEnabled = {
         Name = "Mods Enabled",
         Category = "General",

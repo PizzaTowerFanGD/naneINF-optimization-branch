@@ -9,6 +9,9 @@ local methods = {}
 local shouldTrim = {
     ['\t'] = 1,
     [' '] = 2,
+    ['\n'] = 3, -- our strings are split by newlines exclusively, this should never be trimmed but its still here for safe measure
+    ['\r'] = 4; -- should fix issues with "\r\n" likely being added at the end of lines by BMM
+    ['\r\n'] = 5; -- should never happen but extra safe measure
 }
 
 
@@ -119,7 +122,7 @@ local function compareStrings(pattern, line, hasTag)
     -- willsonthewolf gave a good potential cause here: https://discord.com/channels/1288906099180699658/1324835018299670558/1366571833914294324 (this is in the offical lovely server)
 
     if pattern == '' then return true end
-    if patternLength ~= #line and patternLength ~= #line - 1 and string.sub(pattern, patternLength, patternLength) ~= '*' then
+    if patternLength ~= #line and patternLength ~= #line and string.sub(pattern, patternLength, patternLength) ~= '*' then
         -- no chance to match.
         if hasTag and patternLength/#line >= logIfPercentageFound then
             forcePrint("-----------------------------\n[LUAVELY]: PATTERN TAG DBG, PATTERN: " .. pattern .. " :: WITH TAG " .. hasTag .. ":: HAS NO CHANCE TO MATCH.\n" ..
