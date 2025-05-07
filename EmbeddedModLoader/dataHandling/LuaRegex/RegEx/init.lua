@@ -1,148 +1,31 @@
---!nolint
---!nocheck
 --[[
 	PCRE2-based RegEx implemention for Luau
-	Version 1.0.0a2 (2020)
-	Expat Licence
-	Copyright © 2020, 2023 - Blockzez (devforum.roblox.com/u/Blockzez and github.com/Blockzez)
+	Version 1.0.0a2
+	BSD 2-Clause Licence
+	Copyright © 2020 - Blockzez (devforum.roblox.com/u/Blockzez and github.com/Blockzez)
 	All rights reserved.
-
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
-
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
+	
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+	
+	1. Redistributions of source code must retain the above copyright notice, this
+	   list of conditions and the following disclaimer.
+	
+	2. Redistributions in binary form must reproduce the above copyright notice,
+	   this list of conditions and the following disclaimer in the documentation
+	   and/or other materials provided with the distribution.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+	FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+	DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+	SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+	CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+	OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-
-local function typeof(...)
-	return type(...)
-end
-
-local function newproxy(metatable)
-	local tab = {}
-
-	if metatable then
-		return setmetatable(tab, {})
-	end
-
-	return {}
-end
-
-
--- overwrite the table funcs so i can add the missing functiosn from luau to it
---table.unpack()
-local OLDTABLEFUNC = table
-local table = {}
-
-local utf8 = require("utf8") --require("ModLoader/LuaRegex/utf8extended")
-
-function sign(x)
-	return (x > 0 and 1) or (x < 0 and -1) or 0
-end
-
---[[local function newproxy(metatable)
-	local tab = {}
-
-	if metatable then
-		return setmetatable(tab, {})
-	end
-
-	return {}
-end]]
-
-local function print(...)
-
-end
-
-function table.insert(a, b, c)
-	--print("unpack")
-	for i, v in OLDTABLEFUNC.unpack(a) do
-		--print(i .. " : " .. tostring(v))
-	end
-
-	return OLDTABLEFUNC.insert(a, b, c)
-end
-
-function table.remove(...)
-	local return_
-
-	pcall(function(...)
-		return_ = OLDTABLEFUNC.remove(...)
-	end, ...)
-
-	return return_
-end
-
-function table.concat(...)
-	return OLDTABLEFUNC.concat(...)
-end
-
-
-function table.move(table1, firstIndex, endingIndex, copyAt, table2)
-	local endingIndex = endingIndex or #table1
-	for i = firstIndex, endingIndex do
-		OLDTABLEFUNC.insert(table2, i + copyAt - 1, table1[i])
-	end
-
-	return table2--OLDTABLEFUNC.move(...)
-end
-
---[[function table.pack(...)
-	local packed = {...}
-	return {
-		packed,
-		n = #packed
-	}
-
-	--OLDTABLEFUNC.pack(...)
-end]]
-
-function table.pack(...)
-	t = {...}
-	t.n = select("#", ...)
-
-	return t
-end
-
-function table.sort(...)
-	return OLDTABLEFUNC.sort(...)
-end
-
-function table.unpack(...)
-	return OLDTABLEFUNC.unpack(...)
-end
-
-function table.find(table_, needle)
-	for i, v in pairs(table_) do
-		if v == needle then
-			return v
-		end
-	end
-end
-
-function table.create(length, values)
-	local tab = {}
-
-	for i = 1, length do
-		tab[i] = values or nil
-	end
-
-	return tab
-end
-
-
 --[[ Settings ]]--
 -- You can change them here
 local options = {
@@ -157,13 +40,76 @@ local options = {
 	-- - You try to compile a RegEx with unicode flag
 	-- - You try to use the \p pattern
 	-- The default is true
-	unicodeData = false,
+	unicodeData = true,
 };
 
+-- if we have sisues with off number errors, this might be it.
+function sign(x)
+	return (x > 0 and 1) or (x < 0 and -1) or 0
+end
+
+local function typeof(...)
+	return type(...)
+end
+
+function tableMove(table1, firstIndex, endingIndex, copyAt, table2)
+	local endingIndex = endingIndex or #table1
+	for i = firstIndex, endingIndex do
+		table.insert(table2, i + copyAt - 1, table1[i])
+	end
+
+	return table2--OLDTABLEFUNC.move(...)
+end
+
+function tablePack(...)
+	local t = {...}
+	t.n = select("#", ...)
+
+	return t
+end
+
+function newproxy(empty)
+	local proxy = {}
+
+	if empty then
+		local mt = {}
+		setmetatable(proxy, mt)
+	end
+
+	return proxy
+end
+
+local function tableCreate(length, value)
+	local new = {}
+	
+	for i = 1, length do
+		new[i] = value
+	end
+	
+	return new
+end
+
+local function tableFind(table, needle)
+	for i, v in ipairs(table) do
+		if v == needle then
+			return i
+		end
+	end
+end
+
+local function tableClear(table)
+	for i, v in pairs(table) do
+		table[i] = nil
+	end
+end
+
+
+utf8 = require('utf8')
+
 --
-local u_categories = options.unicodeData and require(script:WaitForChild("_unicodechar_category"));
-local chr_scripts = options.unicodeData and require(script:WaitForChild("_scripts"));
-local xuc_chr = options.unicodeData and require(script:WaitForChild("_xuc"));
+local u_categories = options.unicodeData and require("EmbeddedModLoader/dataHandling/LuaRegex/RegEx/modules/_unicodechar_category");
+local chr_scripts = options.unicodeData and require("EmbeddedModLoader/dataHandling/LuaRegex/RegEx/modules/_scripts");
+local xuc_chr = options.unicodeData and require("EmbeddedModLoader/dataHandling/LuaRegex/RegEx/modules/_xuc");
 local proxy = setmetatable({ }, { __mode = 'k' });
 local re, re_m, match_m = { }, { }, { };
 local lockmsg;
@@ -178,11 +124,11 @@ local function to_str_arr(self, init)
 		return { n = len, s = self, utf8.codepoint(self, 1, #self) };
 	end;
 	local clen = math.ceil(len / 1999);
-	local ret = table.create(len);
+	local ret = tableCreate(len);
 	local p = 1;
 	for i = 1, clen do
-		local c = table.pack(utf8.codepoint(self, utf8.offset(self, i * 1999 - 1998), utf8.offset(self, i * 1999 - (i == clen and 1998 - ((len - 1) % 1999 + 1) or - 1)) - 1));
-		table.move(c, 1, c.n, p, ret);
+		local c = tablePack(utf8.codepoint(self, utf8.offset(self, i * 1999 - 1998), utf8.offset(self, i * 1999 - (i == clen and 1998 - ((len - 1) % 1999 + 1) or - 1)) - 1));
+		tableMove(c, 1, c.n, p, ret);
 		p = p + c.n;
 	end;
 	ret.s, ret.n = self, len;
@@ -195,21 +141,25 @@ local function from_str_arr(self)
 		return utf8.char(table.unpack(self));
 	end;
 	local clen = math.ceil(len / 7997);
-	local r = table.create(clen);
+	local r = tableCreate(clen);
 	for i = 1, clen do
 		r[i] = utf8.char(table.unpack(self, i * 7997 - 7996, i * 7997 - (i == clen and 7997 - ((len - 1) % 7997 + 1) or 0)));
 	end;
 	return table.concat(r);
 end;
 
-local function utf8_sub(self, i, j)
-	j = utf8.offset(self, j); -- j = utf8.offset(self, j));
+local function utf8_sub(self, i, j, DEBUGID)
+	if not (j) then
+		error("UTF8SUB " .. DEBUGID)
+	end
+
+	j = utf8.offset(self, j);
 	return string.sub(self, utf8.offset(self, i), j and j - 1);
 end;
 
 --
 local flag_map = {
-	a = 'anchored', i = 'caseless', m = 'multiline', s = 'dotall', u = 'unicode', U = 'ungreedy', x ='extended',
+	a = 'anchored', i = 'caseless', m = 'multiline', s = 'dotall', u = 'unicode', U = 'ungreedy', x = 'extended',
 };
 
 local posix_class_names = {
@@ -265,12 +215,9 @@ local dot = { 0x2E };
 local beginning_str = { 0x5E };
 local alternation = { 0x7C };
 
-function check_re(re_type, name, func)
+local function check_re(re_type, name, func)
 	if re_type == "Match" then
-		--print("TYPE IS MATCH FOR " .. name .. "!!!!!")
-		--print("SETUP FUNCTION RETURN")
 		return function(...)
-			--print("RETURN FUNCTION FOR " .. name .. "WAS CALLED WITH " .. #{...} .. " ARGUMENTS!!!")
 			local arg_n = select('#', ...);
 			if arg_n < 1 then
 				error("missing argument #1 (Match expected)", 2);
@@ -290,7 +237,6 @@ function check_re(re_type, name, func)
 		end;
 	end;
 	return function(...)
-		--print("CALLED RETURN FUNCTION FOR " .. name)
 		local arg_n = select('#', ...);
 		if arg_n < 1 then
 			error("missing argument #1 (RegEx expected)", 2);
@@ -344,7 +290,7 @@ local function match_tostr(self)
 	if s_end <= s_start then
 		return string.format("Match (%d..%d, empty)", s_start, s_end - 1);
 	end;
-	return string.format("Match (%d..%d): %s", s_start, s_end - 1, utf8_sub(spans.input, s_start, s_end));
+	return string.format("Match (%d..%d): %s", s_start, s_end - 1, utf8_sub(spans.input, s_start, s_end, '1'));
 end;
 
 local function new_match(span_arr, group_id, re, str)
@@ -364,7 +310,7 @@ match_m.group = check_re('Match', 'group', function(self, group_id)
 	if not span then
 		return nil;
 	end;
-	return utf8_sub(self.spans.input, span[1], span[2]);
+	return utf8_sub(self.spans.input, span[1], span[2], '2');
 end);
 
 match_m.span = check_re('Match', 'span', function(self, group_id)
@@ -378,16 +324,16 @@ end);
 match_m.groups = check_re('Match', 'groups', function(self)
 	local spans = self.spans;
 	if spans.n > 0 then
-		local ret = table.create(spans.n);
+		local ret = tableCreate(spans.n);
 		for i = 0, spans.n do
 			local v = spans[i];
 			if v then
-				ret[i] = utf8_sub(spans.input, v[1], v[2]);
+				ret[i] = utf8_sub(spans.input, v[1], v[2], '3');
 			end;
 		end;
 		return table.unpack(ret, 1, spans.n);
 	end;
-	return utf8_sub(spans.input, spans[0][1], spans[0][2]);
+	return utf8_sub(spans.input, spans[0][1], spans[0][2], '4');
 end);
 
 match_m.groupdict = check_re('Match', 'groupdict', function(self)
@@ -396,7 +342,7 @@ match_m.groupdict = check_re('Match', 'groupdict', function(self)
 	for k, v in pairs(self.group_id) do
 		v = spans[v];
 		if v then
-			ret[k] = utf8_sub(spans.input, v[1], v[2]);
+			ret[k] = utf8_sub(spans.input, v[1], v[2], '5');
 		end;
 	end;
 	return ret;
@@ -404,12 +350,17 @@ end);
 
 match_m.grouparr = check_re('Match', 'groupdict', function(self)
 	local spans = self.spans;
-	local ret = table.create(spans.n);
+	local ret = tableCreate(spans.n);
 	for i = 0, spans.n do
 		local v = spans[i];
 		if v then
-			--print(spans.input)
-			ret[i] = utf8_sub(spans.input, v[1], v[2] or v[1]);
+			-- 3XPL PATCH
+			-- v[2] can sometimes come as nil, maybe this means that we reached the end of the script?
+			-- pass v[1] for now.
+			-- original : "v[1], v[2],"
+			-- edit : " or v[1]"
+
+			ret[i] = utf8_sub(spans.input, v[1], v[2] or v[1], '6 ' .. i .. '/' .. spans.n .. '; ' .. #v);
 		end;
 	end;
 	ret.n = spans.n;
@@ -591,7 +542,7 @@ local function find_alternation(token, i, count)
 			if is_table and v[1] == "quantifier" then
 				count = count + v[3];
 			else
-				count = count +  1;
+				count = count + 1;
 			end;
 		end;
 		i = i + 1;
@@ -606,14 +557,13 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 			tkn_i = tkn_i + 1;
 			local next_alt = find_alternation(token, tkn_i);
 			if next_alt then
-				OLDTABLEFUNC.insert(states, 1, { "alternation", next_alt, str_i });
+				table.insert(states, 1, { "alternation", next_alt, str_i });
 			end;
-			goto continue;
+			goto continue1;
 		end;
 		local ctkn = token[tkn_i];
 		local tkn_type = type(ctkn) == "table" and ctkn[1];
 		if not ctkn then
-			--print("NO CTKN FOUND!!!")
 			break;
 		elseif ctkn == "ACCEPT" then
 			local not_lookaround = true;
@@ -634,17 +584,17 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 				break;
 			end;
 		elseif ctkn == "PRUNE" or ctkn == "SKIP" then
-			OLDTABLEFUNC.insert(states, 1, { ctkn, str_i });
+			table.insert(states, 1, { ctkn, str_i });
 			tkn_i = tkn_i + 1;
 		elseif tkn_type == 0x28 then
-			OLDTABLEFUNC.insert(states, 1, { "group", tkn_i, str_i, nil, ctkn[2], ctkn[3], ctkn[4] });
+			table.insert(states, 1, { "group", tkn_i, str_i, nil, ctkn[2], ctkn[3], ctkn[4] });
 			tkn_i = tkn_i + 1;
 			local next_alt, count = find_alternation(token, tkn_i, (ctkn[4] == 0x21 or ctkn[4] == 0x3D) and ctkn[5] and 0);
 			if next_alt then
-				OLDTABLEFUNC.insert(states, 1, { "alternation", next_alt, str_i });
+				table.insert(states, 1, { "alternation", next_alt, str_i });
 			end;
 			if count then
-				str_i = str_i + count;
+				str_i = str_i - count;
 			end;
 		elseif tkn_type == 0x29 and ctkn[4] ~= 0x21 then
 			if ctkn[4] == 0x21 or ctkn[4] == 0x3D then
@@ -656,7 +606,7 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 							str_i = selected_state[3];
 						end;
 						if selected_match_start then
-							OLDTABLEFUNC.insert(states, 1, selected_match_start);
+							table.insert(states, 1, selected_match_start);
 						end;
 						break;
 					elseif selected_state[1] == "matchStart" and not selected_match_start and ctkn[4] == 0x3D then
@@ -681,9 +631,9 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 							end;
 							local ctkn1 = token[ctkn[3]];
 							local new_group = { "group", v[2], str_i, nil, ctkn1[5][2], ctkn1[5][3], "quantifier", ctkn1[2], ctkn1[3], v[10] + 1, v[11], ctkn1[4] };
-							OLDTABLEFUNC.insert(states, 1, new_group);
+							table.insert(states, 1, new_group);
 							if v[11] then
-								OLDTABLEFUNC.insert(states, 1, { "alternation", v[11], str_i });
+								table.insert(states, 1, { "alternation", v[11], str_i });
 							end;
 						end;
 						break;
@@ -692,7 +642,7 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 			end;
 			tkn_i = tkn_i + 1;
 		elseif tkn_type == 0x4B then
-			OLDTABLEFUNC.insert(states, 1, { "matchStart", str_i });
+			table.insert(states, 1, { "matchStart", str_i });
 			tkn_i = tkn_i + 1;
 		elseif tkn_type == 0x7C then
 			local close_i = tkn_i;
@@ -715,11 +665,11 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 				tkn_i = close_i;
 			end;
 		elseif tkn_type == "recurmatch" then
-			OLDTABLEFUNC.insert(states, 1, { "group", ctkn[3], str_i, nil, nil, token[ctkn[3]][3], nil, jmp = tkn_i });
+			table.insert(states, 1, { "group", ctkn[3], str_i, nil, nil, token[ctkn[3]][3], nil, jmp = tkn_i });
 			tkn_i = ctkn[3] + 1;
 			local next_alt, count = find_alternation(token, tkn_i);
 			if next_alt then
-				OLDTABLEFUNC.insert(states, 1, { "alternation", next_alt, str_i });
+				table.insert(states, 1, { "alternation", next_alt, str_i });
 			end;
 		else
 			local match;
@@ -733,9 +683,9 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 				if type(ctkn[5]) == "table" and ctkn[5][1] == 0x28 then
 					local next_alt = find_alternation(token, tkn_i + 1);
 					if next_alt then
-						OLDTABLEFUNC.insert(states, 1, { "alternation", next_alt, str_i });
+						table.insert(states, 1, { "alternation", next_alt, str_i });
 					end;
-					OLDTABLEFUNC.insert(states, next_alt and 2 or 1, { "group", tkn_i, str_i, nil, ctkn[5][2], ctkn[5][3], "quantifier", ctkn[2], ctkn[3], 0, next_alt, ctkn[4] });
+					table.insert(states, next_alt and 2 or 1, { "group", tkn_i, str_i, nil, ctkn[5][2], ctkn[5][3], "quantifier", ctkn[2], ctkn[3], 0, next_alt, ctkn[4] });
 					if ctkn[4] == "lazy" and ctkn[2] == 0 then
 						tkn_i = ctkn[5][3];
 					end;
@@ -761,7 +711,7 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 						if is_backref then
 							if start_i and end_i then
 								local org_i = str_i;
-								if utf8_sub(str_arr.s, start_i, end_i) ~= utf8_sub(str_arr.s, org_i, str_i + pattern_count) then
+								if utf8_sub(str_arr.s, start_i, end_i, '7') ~= utf8_sub(str_arr.s, org_i, str_i + pattern_count, '8') then
 									break;
 								end;
 							else
@@ -778,8 +728,7 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 						if ctkn[4] == "lazy" then
 							min_max_i, str_i = str_i, min_max_i;
 						end;
-						--print("POSSESIV")
-						OLDTABLEFUNC.insert(states, 1, { "quantifier", tkn_i, str_i, math.min(min_max_i, str_arr.n + 1), (ctkn[4] == "lazy" and 1 or -1) * pattern_count });
+						table.insert(states, 1, { "quantifier", tkn_i, str_i, math.min(min_max_i, str_arr.n + 1), (ctkn[4] == "lazy" and 1 or -1) * pattern_count });
 					end;
 				end;
 			elseif tkn_type == "backref" then
@@ -794,7 +743,7 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 				if start_i and end_i then
 					local org_i = str_i;
 					str_i = str_i + end_i - start_i;
-					match = utf8_sub(str_arr.s, start_i, end_i) == utf8_sub(str_arr.s, org_i, str_i);
+					match = utf8_sub(str_arr.s, start_i, end_i, '9') == utf8_sub(str_arr.s, org_i, str_i, '10');
 				end;
 			else
 				local chr = str_arr[str_i];
@@ -824,7 +773,7 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 					local prev_type, prev_state = states[1] and states[1][1], states[1];
 					if not prev_type or prev_type == "PRUNE" or prev_type == "SKIP" then
 						if prev_type then
-							table.clear(states);
+							tableClear(states);
 						end;
 						if start_i > str_arr.n then
 							if as_bool then
@@ -880,13 +829,13 @@ local function re_rawfind(token, str_arr, init, flags, verb_flags, as_bool)
 			tkn_i = tkn_i + 1;
 		end;
 
-		::continue::
+		::continue1::
 	end;
 	if as_bool then
 		return true;
 	end;
 	local match_start_ran = false;
-	local span = table.create(token.group_n);
+	local span = tableCreate(token.group_n);
 	span[0], span.n = { start_i, str_i }, token.group_n;
 	for _, v in ipairs(states) do
 		if v[1] == "matchStart" and not match_start_ran then
@@ -903,49 +852,17 @@ re_m.test = check_re('RegEx', 'test', function(self, str, init)
 	return re_rawfind(self.token, to_str_arr(str, init), 1, self.flags, self.verb_flags, true);
 end);
 
-function exploreAndLog(indent, list)
-	for i, v in pairs(list) do
-		print(indent .. i .. " : " .. tostring(v))
-
-		if (type(v) == 'table') then
-			exploreAndLog(indent .. "	", v)
-		end
-	end
-end
-
-
 re_m.match = check_re('RegEx', 'match', function(self, str, init, source)
-	print("MATCHED CALLED!!!")
-	print("Passed to function:")
-	print("- tokens: ")
-	exploreAndLog("	", self.token)
-	print(str, init)
-	print("\n\n\n\n- strArray: ")
-	exploreAndLog("	", to_str_arr(str, init))
-	print("- init: " .. 1)
-	print("\n\n\n\n- flags: ")
-	exploreAndLog("	", self.flags)
-
-	print("\n\n\n\n- verb_flags: ")
-	exploreAndLog("	" , self.verb_flags)
-
-	print("- as bool: " .. 'false')
-
-	print("- SOURCE PROVIDED: ")
-	exploreAndLog("	", source)
-
 	local span = re_rawfind(self.token, to_str_arr(str, init), 1, self.flags, self.verb_flags, false);
 	if not span then
 		return nil;
 	end;
-
-	print("SPAN: ")
-	print(exploreAndLog("	", span))
 	return new_match(span, self.group_id, source, str);
 end);
 
 re_m.matchall = check_re('RegEx', 'matchall', function(self, str, init, source)
 	str = to_str_arr(str, init);
+
 	local i = 1;
 	return function()
 		local span = i <= str.n + 1 and re_rawfind(self.token, str, i, self.flags, self.verb_flags, false);
@@ -965,16 +882,16 @@ local function insert_tokenized_sub(repl_r, str, span, tkn)
 					if v[3] then
 						insert_tokenized_sub(repl_r, str, span, v[3]);
 					else
-						table.move(str, span[v[2]][1], span[v[2]][2] - 1, #repl_r + 1, repl_r);
+						tableMove(str, span[v[2]][1], span[v[2]][2] - 1, #repl_r + 1, repl_r);
 					end;
 				elseif v[4] then
 					insert_tokenized_sub(repl_r, str, span, v[4]);
 				end;
 			else
-				table.move(v, 1, #v, #repl_r + 1, repl_r);
+				tableMove(v, 1, #v, #repl_r + 1, repl_r);
 			end;
 		elseif span[v] then
-			table.move(str, span[v][1], span[v][2] - 1, #repl_r + 1, repl_r);
+			tableMove(str, span[v][1], span[v][2] - 1, #repl_r + 1, repl_r);
 		end;
 	end;
 	repl_r.n = #repl_r;
@@ -1018,7 +935,7 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 		repl = to_str_arr(repl);
 		if not repl_flags.l then
 			local i1 = 0;
-			local repl_r = table.create(3);
+			local repl_r = tableCreate(3);
 			local group_n = self.token.group_n;
 			local conditional_c = { };
 			while i1 < repl.n do
@@ -1028,24 +945,24 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 				until not repl[i2] or repl[i2] == 0x24 or repl[i2] == 0x5C or (repl[i2] == 0x3A or repl[i2] == 0x7D) and conditional_c[1];
 				min_repl_n = min_repl_n + i2 - i1 - 1;
 				if i2 - i1 > 1 then
-					OLDTABLEFUNC.insert(repl_r, table.move(repl, i1 + 1, i2 - 1, 1, table.create(i2 - i1 - 1)));
+					table.insert(repl_r, tableMove(repl, i1 + 1, i2 - 1, 1, tableCreate(i2 - i1 - 1)));
 				end;
 				if repl[i2] == 0x3A then
 					local current_conditional_c = conditional_c[1];
 					if current_conditional_c[2] then
 						error("malformed substitution pattern", 3);
 					end;
-					current_conditional_c[2] = table.move(repl_r, current_conditional_c[3], #repl_r, 1, table.create(#repl_r + 1 - current_conditional_c[3]));
+					current_conditional_c[2] = tableMove(repl_r, current_conditional_c[3], #repl_r, 1, tableCreate(#repl_r + 1 - current_conditional_c[3]));
 					for i3 = #repl_r, current_conditional_c[3], -1 do
 						repl_r[i3] = nil;
 					end;
 				elseif repl[i2] == 0x7D then
 					local current_conditional_c = table.remove(conditional_c, 1);
-					local second_c = table.move(repl_r, current_conditional_c[3], #repl_r, 1, table.create(#repl_r + 1 - current_conditional_c[3]));
+					local second_c = tableMove(repl_r, current_conditional_c[3], #repl_r, 1, tableCreate(#repl_r + 1 - current_conditional_c[3]));
 					for i3 = #repl_r, current_conditional_c[3], -1 do
 						repl_r[i3] = nil;
 					end;
-					OLDTABLEFUNC.insert(repl_r, { "condition", current_conditional_c[1], current_conditional_c[2] ~= true and (current_conditional_c[2] or second_c), current_conditional_c[2] and second_c });
+					table.insert(repl_r, { "condition", current_conditional_c[1], current_conditional_c[2] ~= true and (current_conditional_c[2] or second_c), current_conditional_c[2] and second_c });
 				elseif repl[i2] then
 					i2 = i2 + 1;
 					local subst_c = repl[i2];
@@ -1055,21 +972,21 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 						end;
 						local prev_repl_f = repl_r[#repl_r];
 						if type(prev_repl_f) == "table" then
-							OLDTABLEFUNC.insert(prev_repl_f, repl[i2 - 1]);
+							table.insert(prev_repl_f, repl[i2 - 1]);
 						else
-							OLDTABLEFUNC.insert(repl_r, { repl[i2 - 1] });
+							table.insert(repl_r, { repl[i2 - 1] });
 						end;
 					elseif subst_c == 0x5C and repl[i2 - 1] == 0x24 then
 						local prev_repl_f = repl_r[#repl_r];
 						if type(prev_repl_f) == "table" then
-							OLDTABLEFUNC.insert(prev_repl_f, 0x24);
+							table.insert(prev_repl_f, 0x24);
 						else
-							OLDTABLEFUNC.insert(repl_r, { 0x24 });
+							table.insert(repl_r, { 0x24 });
 						end;
 						i2 = i2 - 1;
 						min_repl_n = min_repl_n + 1;
 					elseif subst_c == 0x30 then
-						OLDTABLEFUNC.insert(repl_r, 0);
+						table.insert(repl_r, 0);
 					elseif subst_c > 0x30 and subst_c <= 0x39 then
 						local start_i2 = i2;
 						local group_i = subst_c - 0x30;
@@ -1081,7 +998,7 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 						if not repl_flags.u and group_i > group_n then
 							error("reference to non-existent subpattern", 3);
 						end;
-						OLDTABLEFUNC.insert(repl_r, group_i);
+						table.insert(repl_r, group_i);
 					elseif subst_c == 0x7B and repl[i2 - 1] == 0x24 then
 						i2 = i2 + 1;
 						local start_i2 = i2;
@@ -1093,7 +1010,7 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 							i2 = i2 + 1;
 						end;
 						if (repl[i2] == 0x7D or repl[i2] == 0x3A and (repl[i2 + 1] == 0x2B or repl[i2 + 1] == 0x2D)) and i2 ~= start_i2 then
-							local group_k = utf8_sub(repl.s, start_i2, i2);
+							local group_k = utf8_sub(repl.s, start_i2, i2, '11');
 							if repl[start_i2] >= 0x30 and repl[start_i2] <= 0x39 then
 								group_k = tonumber(group_k);
 								if not repl_flags.u and group_k > group_n then
@@ -1107,9 +1024,9 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 							end;
 							if repl[i2] == 0x3A then
 								i2 = i2 + 1;
-								OLDTABLEFUNC.insert(conditional_c, { group_k, repl[i2] == 0x2D, #repl_r + 1 });
+								table.insert(conditional_c, { group_k, repl[i2] == 0x2D, #repl_r + 1 });
 							else
-								OLDTABLEFUNC.insert(repl_r, group_k);
+								table.insert(repl_r, group_k);
 							end;
 						else
 							error("malformed substitution pattern", 3);
@@ -1120,9 +1037,9 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 							if subst_c ~= 0x24 then
 								local prev_repl_f = repl_r[#repl_r];
 								if type(prev_repl_f) == "table" then
-									OLDTABLEFUNC.insert(prev_repl_f, 0x24);
+									table.insert(prev_repl_f, 0x24);
 								else
-									OLDTABLEFUNC.insert(repl_r, { 0x24 });
+									table.insert(repl_r, { 0x24 });
 								end;
 							end;
 						else
@@ -1133,9 +1050,9 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 						end;
 						local prev_repl_f = repl_r[#repl_r];
 						if type(prev_repl_f) == "table" then
-							OLDTABLEFUNC.insert(prev_repl_f, c_escape_char or repl[i2]);
+							table.insert(prev_repl_f, c_escape_char or repl[i2]);
 						else
-							OLDTABLEFUNC.insert(repl_r, { c_escape_char or repl[i2] });
+							table.insert(repl_r, { c_escape_char or repl[i2] });
 						end;
 						min_repl_n = min_repl_n + 1;
 					end;
@@ -1163,12 +1080,12 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 		if repl_type == "string" then
 			repl_r = repl;
 		elseif repl_type == "subst_string" then
-			repl_r = insert_tokenized_sub(table.create(min_repl_n), str, span, repl);
+			repl_r = insert_tokenized_sub(tableCreate(min_repl_n), str, span, repl);
 		else
 			local re_match;
 			local repl_c;
 			if repl_type == "table" then
-				re_match = utf8_sub(str.s, span[0][1], span[0][2]);
+				re_match = utf8_sub(str.s, span[0][1], span[0][2], '12');
 				repl_c = repl[re_match];
 			else
 				re_match = new_match(span, self.group_id, source, str.s);
@@ -1176,7 +1093,7 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 			end;
 			if repl_c == re_match or repl_flags.o and not repl_c then
 				local repl_n = span[0][2] - span[0][1];
-				repl_r = table.move(str, span[0][1], span[0][2] - 1, 1, table.create(repl_n));
+				repl_r = tableMove(str, span[0][1], span[0][2] - 1, 1, tableCreate(repl_n));
 				repl_r.n = repl_n;
 			elseif type(repl_c) == "string" then
 				repl_r = to_str_arr(repl_c);
@@ -1203,7 +1120,7 @@ re_m.sub = check_re('RegEx', 'sub', function(self, repl, str, n, repl_flag_str, 
 			end;
 		elseif repl_r.n > match_len then
 			for i2 = 1, repl_r.n - match_len do
-				OLDTABLEFUNC.insert(str, i1 + i2 - 1, repl_r[repl_len + i2]);
+				table.insert(str, i1 + i2 - 1, repl_r[repl_len + i2]);
 				incr = incr + 1;
 				i0 = i0 + 1;
 			end;
@@ -1240,11 +1157,11 @@ re_m.split = check_re('RegEx', 'split', function(self, str, n)
 		if not span then
 			break;
 		end;
-		OLDTABLEFUNC.insert(ret, utf8_sub(str.s, i - prev_empty, span[0][1]));
+		table.insert(ret, utf8_sub(str.s, i - prev_empty, span[0][1], '13'));
 		prev_empty = span[0][1] >= span[0][2] and 1 or 0;
 		i = span[0][2] + prev_empty;
 	end;
-	OLDTABLEFUNC.insert(ret, string.sub(str.s, utf8.offset(str.s, i - prev_empty)));
+	table.insert(ret, string.sub(str.s, utf8.offset(str.s, i - prev_empty)));
 	return ret;
 end);
 
@@ -1297,7 +1214,7 @@ local function tokenize_ptn(codes, flags)
 					-- fallback as normal and ( can't be repeated
 					return "quantifier doesn't follow a repeatable pattern";
 				end;
-				local selected_verb = utf8_sub(codes.s, start_i, i);
+				local selected_verb = utf8_sub(codes.s, start_i, i, '14');
 				if selected_verb == "positive_lookahead:" or selected_verb == "negative_lookhead:"
 						or selected_verb == "positive_lookbehind:" or selected_verb == "negative_lookbehind:"
 						or selected_verb:find("^[pn]l[ab]:$") then
@@ -1325,7 +1242,7 @@ local function tokenize_ptn(codes, flags)
 				i = i + 2;
 				if codes[i] == 0x23 then
 					-- comments
-					i = table.find(codes, 0x29, i);
+					i = tableFind(codes, 0x29, i);
 					if not i then
 						return "unterminated parenthetical";
 					end;
@@ -1348,7 +1265,7 @@ local function tokenize_ptn(codes, flags)
 					if codes[i] ~= 0x29 then
 						return "invalid group structure";
 					end;
-					ret[1], ret[2], ret[4] = "recurmatch", tonumber(utf8_sub(codes.s, org_i, i)), nil;
+					ret[1], ret[2], ret[4] = "recurmatch", tonumber(utf8_sub(codes.s, org_i, i, '15')), nil;
 				elseif codes[i] == 0x3C and codes[i + 1] == 0x21 or codes[i + 1] == 0x3D then
 					-- lookbehinds
 					i = i + 1;
@@ -1375,7 +1292,7 @@ local function tokenize_ptn(codes, flags)
 						elseif codes[i] ~= 0x29 or i == start_i then
 							return "invalid group structure";
 						end;
-						ret = { "backref", utf8_sub(codes.s, start_i, i) };
+						ret = { "backref", utf8_sub(codes.s, start_i, i, '16') };
 					elseif codes[i] == 0x3C or codes[i - 1] ~= 0x50 and codes[i] == 0x27 then
 						-- named capture
 						local delimiter = codes[i] == 0x27 and 0x27 or 0x3E;
@@ -1401,7 +1318,7 @@ local function tokenize_ptn(codes, flags)
 						elseif codes[i] ~= delimiter then
 							return "invalid character in subpattern";
 						end;
-						local name = utf8_sub(codes.s, start_i, i);
+						local name = utf8_sub(codes.s, start_i, i, '17');
 						group_n = group_n + 1;
 						if (group_id[name] or group_n) ~= group_n then
 							return "subpattern name already exists";
@@ -1424,7 +1341,7 @@ local function tokenize_ptn(codes, flags)
 				ret = { 0x28, group_n, nil, nil };
 			end;
 			if ret then
-				OLDTABLEFUNC.insert(outln, ret);
+				table.insert(outln, ret);
 			end;
 		elseif c == 0x29 then
 			-- Close parenthesis
@@ -1480,9 +1397,9 @@ local function tokenize_ptn(codes, flags)
 				return "lookbehind assertion is not fixed width";
 			end;
 			v[3] = outln_len_p_1;
-			OLDTABLEFUNC.insert(outln, ret);
+			table.insert(outln, ret);
 		elseif c == 0x2E then
-			OLDTABLEFUNC.insert(outln, dot);
+			table.insert(outln, dot);
 		elseif c == 0x5B then
 			-- Character set
 			local negate, char_class = false, nil;
@@ -1507,7 +1424,7 @@ local function tokenize_ptn(codes, flags)
 					return "unterminated character class";
 				elseif codes[i] == 0x2D and ret[1] and type(ret[1]) == "number" then
 					if codes[i + 1] == 0x5D then
-						OLDTABLEFUNC.insert(ret, 1, 0x2D);
+						table.insert(ret, 1, 0x2D);
 					else
 						i = i + 1;
 						local ret_c = codes[i];
@@ -1516,7 +1433,7 @@ local function tokenize_ptn(codes, flags)
 								-- Check for POSIX character class, name does not matter
 								local i1 = i + 2;
 								repeat
-									i1 = table.find(codes, 0x5D, i1);
+									i1 = tableFind(codes, 0x5D, i1);
 								until not i1 or codes[i1 - 1] ~= 0x5C;
 								if not i1 then
 									return "unterminated character class";
@@ -1574,27 +1491,27 @@ local function tokenize_ptn(codes, flags)
 					if codes[i + 1] == 0x2E or codes[i + 1] == 0x3A or codes[i + 1] == 0x3D then
 						local i1 = i + 2;
 						repeat
-							i1 = table.find(codes, 0x5D, i1);
+							i1 = tableFind(codes, 0x5D, i1);
 						until not i1 or codes[i1 - 1] ~= 0x5C;
 						if not i1 then
 							return "unterminated character class";
 						elseif codes[i1 - 1] ~= codes[i + 1] or i1 - 1 == i + 1 then
-							OLDTABLEFUNC.insert(ret, 1, 0x5B);
+							table.insert(ret, 1, 0x5B);
 						elseif codes[i1 - 1] == 0x2E or codes[i1 - 1] == 0x3D then
 							return "POSIX collating elements aren't supported";
 						elseif codes[i1 - 1] == 0x3A then
 							-- I have no plans to support escape codes (\) in character class names
 							local negate = codes[i + 3] == 0x5E;
-							local class_name = utf8_sub(codes.s, i + (negate and 3 or 2), i1 - 1);
+							local class_name = utf8_sub(codes.s, i + (negate and 3 or 2), i1 - 1, '18');
 							--  If not valid then throw an error
 							if not posix_class_names[class_name] then
 								return "unknown POSIX class name";
 							end;
-							OLDTABLEFUNC.insert(ret, 1, { "class", class_name, negate });
+							table.insert(ret, 1, { "class", class_name, negate });
 							i = i1;
 						end;
 					else
-						OLDTABLEFUNC.insert(ret, 1, 0x5B);
+						table.insert(ret, 1, 0x5B);
 					end;
 				elseif codes[i] == 0x5C then
 					i = i + 1;
@@ -1615,7 +1532,7 @@ local function tokenize_ptn(codes, flags)
 							elseif i - org_i > 4 then
 								return "character offset too large";
 							end;
-							OLDTABLEFUNC.insert(ret, 1, tonumber(utf8_sub(codes.s, org_i, i), 16));
+							table.insert(ret, 1, tonumber(utf8_sub(codes.s, org_i, i, '19'), 16));
 						else
 							if codes[i] and codes[i] >= 0x30 and codes[i] <= 0x39 or codes[i] >= 0x41 and codes[i] <= 0x46 or codes[i] >= 0x61 and codes[i] <= 0x66 then
 								radix0 = codes[i] - ((codes[i] >= 0x41 and codes[i] <= 0x5A) and 0x37 or (codes[i] >= 0x61 and codes[i] <= 0x7A) and 0x57 or 0x30);
@@ -1628,7 +1545,7 @@ local function tokenize_ptn(codes, flags)
 							else
 								i = i - 1;
 							end;
-							OLDTABLEFUNC.insert(ret, 1, radix0 and (radix1 and 16 * radix0 + radix1 or radix0) or 0);
+							table.insert(ret, 1, radix0 and (radix1 and 16 * radix0 + radix1 or radix0) or 0);
 						end;
 					elseif codes[i] >= 0x30 and codes[i] <= 0x37 then
 						local radix0, radix1, radix2 = codes[i] - 0x30, nil, nil;
@@ -1644,15 +1561,15 @@ local function tokenize_ptn(codes, flags)
 						else
 							i = i - 1;
 						end;
-						OLDTABLEFUNC.insert(ret, 1, radix1 and (radix2 and 64 * radix0 + 8 * radix1 + radix2 or 8 * radix0 + radix1) or radix0);
+						table.insert(ret, 1, radix1 and (radix2 and 64 * radix0 + 8 * radix1 + radix2 or 8 * radix0 + radix1) or radix0);
 					elseif codes[i] == 0x45 then
 						-- intentionally left blank, \E that's not preceded \Q is ignored
 					elseif codes[i] == 0x51 then
 						local start_i = i + 1;
 						repeat
-							i = table.find(codes, 0x5C, i + 1);
+							i = tableFind(codes, 0x5C, i + 1);
 						until not i or codes[i + 1] == 0x45;
-						table.move(codes, start_i, i and i - 1 or #codes, #outln + 1, outln);
+						tableMove(codes, start_i, i and i - 1 or #codes, #outln + 1, outln);
 						if not i then
 							break;
 						end;
@@ -1670,8 +1587,8 @@ local function tokenize_ptn(codes, flags)
 							if codes[i] ~= 0x7D or i == start_i then
 								return "malformed Unicode code point";
 							end;
-							local code_point = tonumber(utf8_sub(codes.s, start_i, i));
-							OLDTABLEFUNC.insert(ret, 1, code_point);
+							local code_point = tonumber(utf8_sub(codes.s, start_i, i, '20'));
+							table.insert(ret, 1, code_point);
 						else
 							return "invalid escape sequence";
 						end;
@@ -1685,7 +1602,7 @@ local function tokenize_ptn(codes, flags)
 							if not valid_categories[c_name] then
 								return "unknown or malformed script name";
 							end;
-							OLDTABLEFUNC.insert(ret, 1, { "category", false, c_name });
+							table.insert(ret, 1, { "category", false, c_name });
 						else
 							local negate = codes[i] == 0x50;
 							i = i + 1;
@@ -1704,14 +1621,14 @@ local function tokenize_ptn(codes, flags)
 							if codes[i] ~= 0x7D then
 								return "unknown or malformed script name";
 							end;
-							local c_name = utf8_sub(codes.s, start_i, i);
+							local c_name = utf8_sub(codes.s, start_i, i, '21');
 							local script_set = chr_scripts[c_name];
 							if script_set then
-								OLDTABLEFUNC.insert(ret, 1, { "charset", negate, script_set });
+								table.insert(ret, 1, { "charset", negate, script_set });
 							elseif not valid_categories[c_name] then
 								return "unknown or malformed script name";
 							else
-								OLDTABLEFUNC.insert(ret, 1, { "category", negate, c_name });
+								table.insert(ret, 1, { "category", negate, c_name });
 							end;
 						end;
 					elseif codes[i] == 0x6F then
@@ -1727,19 +1644,19 @@ local function tokenize_ptn(codes, flags)
 						if codes[i] ~= 0x7D or i == org_i then
 							return "malformed octal code";
 						end;
-						local ret_chr = tonumber(utf8_sub(codes.s, org_i, i), 8);
+						local ret_chr = tonumber(utf8_sub(codes.s, org_i, i, '22'), 8);
 						if ret_chr > 0xFFFF then
 							return "character offset too large";
 						end;
-						OLDTABLEFUNC.insert(ret, 1, ret_chr);
+						table.insert(ret, 1, ret_chr);
 					else
 						local esc_char = escape_chars[codes[i]];
-						OLDTABLEFUNC.insert(ret, 1, type(esc_char) == "string" and { "class", esc_char, false } or esc_char or codes[i]);
+						table.insert(ret, 1, type(esc_char) == "string" and { "class", esc_char, false } or esc_char or codes[i]);
 					end;
 				elseif flags.ignoreCase and codes[i] >= 0x61 and codes[i] <= 0x7A then
-					OLDTABLEFUNC.insert(ret, 1, codes[i] - 0x20);
+					table.insert(ret, 1, codes[i] - 0x20);
 				else
-					OLDTABLEFUNC.insert(ret, 1, codes[i]);
+					table.insert(ret, 1, codes[i]);
 				end;
 				i = i + 1;
 			end;
@@ -1747,9 +1664,9 @@ local function tokenize_ptn(codes, flags)
 				return char_class == 0x3A and "POSIX named classes are only support within a character set" or "POSIX collating elements aren't supported";
 			end;
 			if not ret[2] and not negate then
-				OLDTABLEFUNC.insert(outln, ret[1]);
+				table.insert(outln, ret[1]);
 			else
-				OLDTABLEFUNC.insert(outln, { "charset", negate, ret });
+				table.insert(outln, { "charset", negate, ret });
 			end;
 		elseif c == 0x5C then
 			-- Escape char
@@ -1762,7 +1679,7 @@ local function tokenize_ptn(codes, flags)
 				while codes[i + 1] and codes[i + 1] >= 0x30 and codes[i + 1] <= 0x39 do
 					i = i + 1;
 				end;
-				local escape_d = tonumber(utf8_sub(codes.s, org_i, i + 1));
+				local escape_d = tonumber(utf8_sub(codes.s, org_i, i + 1, '23'));
 				if escape_d > group_n and i ~= org_i then
 					i = org_i;
 					local radix0, radix1, radix2;
@@ -1781,18 +1698,18 @@ local function tokenize_ptn(codes, flags)
 							i = i - 1;
 						end;
 					end;
-					OLDTABLEFUNC.insert(outln, radix0 and (radix1 and (radix2 and 64 * radix0 + 8 * radix1 + radix2 or 8 * radix0 + radix1) or radix0) or codes[org_i]);
+					table.insert(outln, radix0 and (radix1 and (radix2 and 64 * radix0 + 8 * radix1 + radix2 or 8 * radix0 + radix1) or radix0) or codes[org_i]);
 				else
-					OLDTABLEFUNC.insert(outln, { "backref", escape_d });
+					table.insert(outln, { "backref", escape_d });
 				end;
 			elseif escape_c == 0x45 then
 				-- intentionally left blank, \E that's not preceded \Q is ignored
 			elseif escape_c == 0x51 then
 				local start_i = i + 1;
 				repeat
-					i = table.find(codes, 0x5C, i + 1);
+					i = tableFind(codes, 0x5C, i + 1);
 				until not i or codes[i + 1] == 0x45;
-				table.move(codes, start_i, i and i - 1 or #codes, #outln + 1, outln);
+				tableMove(codes, start_i, i and i - 1 or #codes, #outln + 1, outln);
 				if not i then
 					break;
 				end;
@@ -1810,10 +1727,10 @@ local function tokenize_ptn(codes, flags)
 					if codes[i] ~= 0x7D or i == start_i then
 						return "malformed Unicode code point";
 					end;
-					local code_point = tonumber(utf8_sub(codes.s, start_i, i));
-					OLDTABLEFUNC.insert(outln, code_point);
+					local code_point = tonumber(utf8_sub(codes.s, start_i, i, '24'));
+					table.insert(outln, code_point);
 				else
-					OLDTABLEFUNC.insert(outln, escape_chars[0x4E]);
+					table.insert(outln, escape_chars[0x4E]);
 				end;
 			elseif escape_c == 0x50 or escape_c == 0x70 then
 				if not options.unicodeData then
@@ -1825,7 +1742,7 @@ local function tokenize_ptn(codes, flags)
 					if not valid_categories[c_name] then
 						return "unknown or malformed script name";
 					end;
-					OLDTABLEFUNC.insert(outln, { "category", false, c_name });
+					table.insert(outln, { "category", false, c_name });
 				else
 					local negate = escape_c == 0x50;
 					i = i + 1;
@@ -1844,14 +1761,14 @@ local function tokenize_ptn(codes, flags)
 					if codes[i] ~= 0x7D then
 						return "unknown or malformed script name";
 					end;
-					local c_name = utf8_sub(codes.s, start_i, i);
+					local c_name = utf8_sub(codes.s, start_i, i, '25');
 					local script_set = chr_scripts[c_name];
 					if script_set then
-						OLDTABLEFUNC.insert(outln, { "charset", negate, script_set });
+						table.insert(outln, { "charset", negate, script_set });
 					elseif not valid_categories[c_name] then
 						return "unknown or malformed script name";
 					else
-						OLDTABLEFUNC.insert(outln, { "category", negate, c_name });
+						table.insert(outln, { "category", negate, c_name });
 					end;
 				end;
 			elseif escape_c == 0x67 and (codes[i + 1] == 0x7B or codes[i + 1] >= 0x30 and codes[i + 1] <= 0x39) then
@@ -1873,8 +1790,8 @@ local function tokenize_ptn(codes, flags)
 				if is_grouped and codes[i] ~= 0x7D then
 					return "malformed reference code";
 				end;
-				local ref_name = tonumber(utf8_sub(codes.s, org_i, i + (is_grouped and 0 or 1)));
-				OLDTABLEFUNC.insert(outln, { "backref", ref_name });
+				local ref_name = tonumber(utf8_sub(codes.s, org_i, i + (is_grouped and 0 or 1), '26'));
+				table.insert(outln, { "backref", ref_name });
 				if not is_grouped then
 					i = i - 1;
 				end;
@@ -1891,11 +1808,11 @@ local function tokenize_ptn(codes, flags)
 				if codes[i] ~= 0x7D or i == org_i then
 					return "malformed octal code";
 				end;
-				local ret_chr = tonumber(utf8_sub(codes.s, org_i, i), 8);
+				local ret_chr = tonumber(utf8_sub(codes.s, org_i, i, '27'), 8);
 				if ret_chr > 0xFFFF then
 					return "character offset too large";
 				end;
-				OLDTABLEFUNC.insert(outln, ret_chr);
+				table.insert(outln, ret_chr);
 			elseif escape_c == 0x78 then
 				local radix0, radix1;
 				i = i + 1;
@@ -1913,7 +1830,7 @@ local function tokenize_ptn(codes, flags)
 					elseif i - org_i > 4 then
 						return "character offset too large";
 					end;
-					OLDTABLEFUNC.insert(outln, tonumber(utf8_sub(codes.s, org_i, i), 16));
+					table.insert(outln, tonumber(utf8_sub(codes.s, org_i, i, '28'), 16));
 				else
 					if codes[i] and (codes[i] >= 0x30 and codes[i] <= 0x39 or codes[i] >= 0x41 and codes[i] <= 0x46 or codes[i] >= 0x61 and codes[i] <= 0x66) then
 						radix0 = codes[i] - ((codes[i] >= 0x41 and codes[i] <= 0x5A) and 0x37 or (codes[i] >= 0x61 and codes[i] <= 0x7A) and 0x57 or 0x30);
@@ -1926,11 +1843,11 @@ local function tokenize_ptn(codes, flags)
 					else
 						i = i - 1;
 					end;
-					OLDTABLEFUNC.insert(outln, radix0 and (radix1 and 16 * radix0 + radix1 or radix0) or 0);
+					table.insert(outln, radix0 and (radix1 and 16 * radix0 + radix1 or radix0) or 0);
 				end;
 			else
 				local esc_char = b_escape_chars[escape_c] or escape_chars[escape_c];
-				OLDTABLEFUNC.insert(outln, esc_char or escape_c);
+				table.insert(outln, esc_char or escape_c);
 			end;
 		elseif c == 0x2A or c == 0x2B or c == 0x3F or c == 0x7B then
 			-- Quantifier
@@ -1947,16 +1864,16 @@ local function tokenize_ptn(codes, flags)
 				if codes[i + 1] == 0x7D then
 					i = i + 1;
 					if not start_i then
-						start_q = tonumber(utf8_sub(codes.s, org_i, i));
+						start_q = tonumber(utf8_sub(codes.s, org_i, i, '29'));
 						end_q = start_q;
 					else
-						start_q, end_q = tonumber(utf8_sub(codes.s, org_i, start_i)), start_i + 1 == i and math.huge or tonumber(utf8_sub(codes.s, start_i + 1, i));
+						start_q, end_q = tonumber(utf8_sub(codes.s, org_i, start_i, '30')), start_i + 1 == i and math.huge or tonumber(utf8_sub(codes.s, start_i + 1, i, '31'));
 						if end_q < start_q then
 							return "numbers out of order in {} quantifier";
 						end;
 					end;
 				else
-					table.move(codes, org_i - 1, i, #outln + 1, outln);
+					tableMove(codes, org_i - 1, i, #outln + 1, outln);
 				end;
 			else
 				start_q, end_q = c == 0x2B and 1 or 0, c == 0x3F and 1 or math.huge;
@@ -1984,7 +1901,7 @@ local function tokenize_ptn(codes, flags)
 			end;
 		elseif c == 0x7C then
 			-- Alternation
-			OLDTABLEFUNC.insert(outln, alternation);
+			table.insert(outln, alternation);
 			local i1 = #outln;
 			repeat
 				i1 = i1 - 1;
@@ -1999,9 +1916,9 @@ local function tokenize_ptn(codes, flags)
 				end;
 			until not v1;
 		elseif c == 0x24 or c == 0x5E then
-			OLDTABLEFUNC.insert(outln, c == 0x5E and beginning_str or end_str);
+			table.insert(outln, c == 0x5E and beginning_str or end_str);
 		elseif flags.ignoreCase and c >= 0x61 and c <= 0x7A then
-			OLDTABLEFUNC.insert(outln, c - 0x20);
+			table.insert(outln, c - 0x20);
 		elseif flags.extended and (c >= 0x09 and c <= 0x0D or c == 0x20 or c == 0x23) then
 			if c == 0x23 then
 				repeat
@@ -2009,11 +1926,11 @@ local function tokenize_ptn(codes, flags)
 				until not codes[i] or codes[i] == 0x0A or codes[i] == 0x0D;
 			end;
 		else
-			OLDTABLEFUNC.insert(outln, c);
+			table.insert(outln, c);
 		end;
 		i = i + 1;
 
-		::continue2::
+		:: continue2 ::
 	end;
 	local max_group_n = 0;
 	for i, v in ipairs(outln) do
@@ -2058,19 +1975,19 @@ elseif cacheSize == math.huge then
 elseif cacheSize >= 2 ^ 32 then
 	error("cache size too large", 2);
 else
-	cache_pattern, cache_pattern_names = table.create(options.cacheSize), table.create(options.cacheSize);
+	cache_pattern, cache_pattern_names = tableCreate(options.cacheSize), tableCreate(options.cacheSize);
 end;
 if cacheSize then
 	function re.pruge()
-		table.clear(cache_pattern_names);
-		table.clear(cache_pattern);
+		tableClear(cache_pattern_names);
+		tableClear(cache_pattern);
 	end;
 end;
 
 local function new_re(str_arr, flags, flag_repr, pattern_repr)
 	local tokenized_ptn, group_id, verb_flags;
 	local cache_format = cacheSize and string.format("%s|%s", str_arr.s, flag_repr);
-	local cached_token = cacheSize and cache_pattern[table.find(cache_pattern_names, cache_format)];
+	local cached_token = cacheSize and cache_pattern[tableFind(cache_pattern_names, cache_format)];
 	if cached_token then
 		tokenized_ptn, group_id, verb_flags = table.unpack(cached_token, 1, 3);
 	else
@@ -2079,8 +1996,8 @@ local function new_re(str_arr, flags, flag_repr, pattern_repr)
 			error(tokenized_ptn, 2);
 		end;
 		if cacheSize and tokenized_ptn[1] then
-			OLDTABLEFUNC.insert(cache_pattern_names, 1, cache_format);
-			OLDTABLEFUNC.insert(cache_pattern, 1, { tokenized_ptn, group_id, verb_flags });
+			table.insert(cache_pattern_names, 1, cache_format);
+			table.insert(cache_pattern, 1, { tokenized_ptn, group_id, verb_flags });
 			if cacheSize ~= math.huge then
 				table.remove(cache_pattern_names, cacheSize + 1);
 				table.remove(cache_pattern, cacheSize + 1);
@@ -2129,9 +2046,7 @@ function re.new(...)
 			error("invalid regular expression flag " .. f, 3);
 		end;
 		flags[flag_map[f]] = true;
-		print(flag_repr, f)
-		--OLDTABLEFUNC.insert(flag_repr, f); -- JUMP
-		flag_repr[#flag_repr + 1] = f
+		table.insert(flag_repr, f);
 	end;
 	table.sort(flag_repr, sort_flag_chr);
 	flag_repr = table.concat(flag_repr);
@@ -2158,13 +2073,13 @@ function re.fromstring(...)
 
 	local i0 = 1;
 	repeat
-		i0 = table.find(str_arr, delimiter, i0 + 1);
+		i0 = tableFind(str_arr, delimiter, i0 + 1);
 		if not i0 then
 			error(string.format("no ending delimiter ('%s') found", utf8.char(delimiter)), 2);
 		end;
 		local escape_count = 1;
 		while str_arr[i0 - escape_count] == 0x5C do
-			escape_count = escape_count + 1;
+			escape_count = count + 1;
 		end;
 	until escape_count % 2 == 1;
 
@@ -2177,9 +2092,10 @@ function re.fromstring(...)
 		str_arr.n = str_arr.n - 1;
 		if flags[flag_map[f]] ~= false then
 			error("invalid regular expression flag " .. f, 3);
+			--error("invalid regular expression flag " .. f, 3);
 		end;
 		flags[flag_map[f]] = true;
-		OLDTABLEFUNC.insert(flag_repr, f);
+		table.insert(flag_repr, f);
 	end;
 	table.sort(flag_repr, sort_flag_chr);
 	flag_repr = table.concat(flag_repr);
@@ -2230,7 +2146,7 @@ end;
 
 re_m = { __index = re_m };
 
-lockmsg = [[metatable is locked or sum idk]]--re.fromstring([[/The\s*metatable\s*is\s*(?:locked|inaccessible)(?#Nice try :])/i]]);
+lockmsg = "its locked" -- re.fromstring([[/The\s*metatable\s*is\s*(?:locked|inaccessible)(?#Nice try :])/i]]);
 getmetatable(lockmsg).__metatable = lockmsg;
 
 local function readonly_table()
@@ -2245,8 +2161,8 @@ match_m = {
 
 re.Match = setmetatable({ }, match_m);
 
-return setmetatable({ }, {
+return re --[[setmetatable({ }, {
 	__index = re,
 	__metatable = lockmsg,
 	__newindex = readonly_table,
-});
+});]]

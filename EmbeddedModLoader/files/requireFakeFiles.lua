@@ -61,7 +61,8 @@ function methods.require(path)
         forcePrint("Reason: " .. err .. "  " .. tostring(error_))
         forcePrint(error_)
         forcePrint(err)
-        error(error_ or err)
+        --error(error_ or err)
+        forcePrint(error_ or err)
         loadedRequires[path] = oldRequire(path)
     end
 

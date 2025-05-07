@@ -1,5 +1,5 @@
 
-
+--[[
 local RegEx = require("EmbeddedModLoader/dataHandling/LuaRegex/RegEx/init")
 
 --LuaRegex.RegEx.init()
@@ -10,7 +10,7 @@ local RegExpMetatable = {
     __tostring = function(self)
         --[[if not self then
             --print(self._innerRegEx)
-        end]]
+        end] ]
         return tostring(self._innerRegEx)
     end,
 }
@@ -90,7 +90,7 @@ function RegExp:exec(str, numFber)
     ----print(groups)
     --[[for i, v in pairs(groups) do
         --print(v)
-    end]]
+    end] ]
 
     -- NOTE TO ME TOMMOROW
     -- the issue lies in the spans, they're USUALLY slightly offset either a couple ahead or behind the actual group.
@@ -154,7 +154,7 @@ function RegExp:exec(str, numFber)
             --[[if string.sub(str, 1, 1) == " " and not match:groupdict()['indent'] then
                 start = start + 1
                 end_ = end_ + 1
-            end]]
+            end] ]
 
             return {
                 start = start,
@@ -182,7 +182,7 @@ function RegExp:exec(str, numFber)
             return {
                 start = tonumber(split[1]),
                 ['end'] = tonumber(split[3])
-            }]]
+            }] ]
         end
 
         return methods
@@ -216,4 +216,6 @@ local interface = setmetatable(RegExp, {
     __call = new,
 })
 
-return interface
+return interface]]
+
+return {}

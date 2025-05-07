@@ -84,6 +84,14 @@ end
 -- music path
 musicManager = require(path .. 'menuScripts/runMusic')
 
+function love.keypressed(key)
+    -- debug
+    if key == 'l' then
+        _G.MenuSettings.OverwriteAutoReinjection.Value = false
+        _G.MenuSettings.LoadUsingIndexedFiles.Value = false
+    end
+end
+
 function love.mousepressed(...)
     library.mousepressed(...)
 end

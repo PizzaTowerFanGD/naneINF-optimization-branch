@@ -1,6 +1,6 @@
 local module = {}
 
-local regex = require("EmbeddedModLoader/dataHandling/LuaRegex/Regexp")
+local regex = require("EmbeddedModLoader/dataHandling/LuaRegex/init")
 
 --local faker = require("EmbeddedModLoader/files/fakeLuaFile")
 
@@ -17,15 +17,19 @@ local function isAlphabeticCharacter(chr)
     return false
 end
 
+--[[function forcePrint(...)
+    return print(...)
+end]]
+
 local oldprintreal = print
 local oldprint = function(...)
     --writeToConsole(...)
     return forcePrint(...)
 end
 
-local function print(...)
-    --print(...)
-end
+--local function print(...)
+--return print(...)
+--end
 
 local function spanOf(inside, find, ignore, offset)
     local findLen = #find
@@ -84,6 +88,7 @@ local function findAndReplaceGroupRequests(payload, patch, matches)
                 end
 
                 activeRecording = {}
+                --goto continue
                 goto continue
             end
 
@@ -92,6 +97,7 @@ local function findAndReplaceGroupRequests(payload, patch, matches)
             recordingLength = recordingLength + 1 -- yay it actually is a group request
 
 
+            --goto continue
             goto continue
         end
 
@@ -120,20 +126,47 @@ local function findAndReplaceGroupRequests(payload, patch, matches)
     return payload
 end
 
+--[[local faker = {
+    RequestDynamicFile = function(...)
+        local source = require(script.Parent.Source)
+
+
+        return {
+            getSource = function()
+                return source
+            end,
+
+            setSource = function(new)
+                source = new
+            end,
+        }
+    end
+}]]
+
 
 
 
 function module:apply(patch)
-    -- regex for finding the pattern
-    local newRe = regex(patch.pattern, "m")
+    local file = faker.RequestDynamicFile(patch.target)
+    local source = file.getSource()
 
+    -- regex for finding the pattern
+    forcePrint(patch.pattern)
+    forcePrint("m")
+
+    local newRe = regex.new(patch.pattern, "m", source) --.. (patch.verbose and 'x' or '')
+
+    if #newRe <= 0 then
+        oldprint("REGEX: NO MATCHES FOUND FOR: " .. patch.pattern .. "       IN    " .. patch.target .. "   !!!!!!!!!")
+        return
+    end
 
     -- the matchall function does not work as intended and does not return any other capture other than the first capture
     -- that is found, so to replace this we have to continue to iterate until we have reached patch.times or until we cant find another capture.
 
-    local file = faker.RequestDynamicFile(patch.target)
     local captureTimes = patch.times or math.huge---1
-    local iter = 0
+    local offset = 0
+    local offset2 = 0
 
     if not file then
         return
@@ -141,35 +174,21 @@ function module:apply(patch)
 
     -- the content we replace in the pattern, $0 means the first group aka the whole thing
     local root_capture = patch.root_capture or "0"--"$0"
-    local offset = 0
-    local offset2 = 0
 
-    local history = ""
-
-    while true do
-        if iter > captureTimes then
-            break
+    for i, exec in ipairs(newRe) do
+        -- prevents too many captures from being made, weird method but it does the same thing
+        if i > captureTimes then
+            print("Capture index over! " .. i)
+            goto continue
         end
 
-        iter = iter + 1
+        print("1")
+
+        --iter = iter + 1
 
         -- find the match for the pattern in the script.
-        local source = file.getSource()
-        local sourceToSearch = string.sub(source, offset, #source)
-
-        local exec = newRe:exec(sourceToSearch)
-
-        -- no more patches left
-        if not exec or iter > captureTimes then
-            if iter == 1 then
-                oldprint("REGEX: NO MATCHES FOUND FOR: " .. patch.pattern .. "       IN    " .. patch.target .. "   !!!!!!!!!")
-            end
-            break
-        end
-
-
-        -- main span, this is the whole pattern that we found
-        local target = exec.get_group(0):extract()
+        local sourceToSearch = string.sub(source, 0, #source)
+        local target = exec.get_group(0):extract() 		-- main span, this is the whole pattern that we found
 
         -- line prepend, just adds stuff before every line
         -- patch.line_prepend and exec.get_group(string.sub(patch.line_prepend, 2)).getValue() or ""
@@ -184,47 +203,21 @@ function module:apply(patch)
         end
 
         local rootGroup = exec.get_group(root_capture):extract()
-
-        if root_capture == "a" then
-            print("ROOTCAPTURE IS A:    ")
-            print(#prepend)
-            print(exec.n)
-            --print(string.sub(patch.line_prepend, 2))
-            --print(patch.line_prepend, 2)
-            print(exec.match:group())
-            print(rootGroup.value)
-            exploreAndLog("", rootGroup)
-        end
-
-        --print(root_capture)
-        local replaceSpan = root_capture == "0" and target.span or rootGroup.span --spanOf(target.value, rootGroup.value, prepend, target.span.start) -- dont search the prepend, it can cause inaccurate results.
-        if root_capture == "a" then
-            print("SPANN: " .. string.sub(sourceToSearch, replaceSpan.start+2, replaceSpan['end']+2))
-            print("SPANN: " .. replaceSpan.start .. ", " .. replaceSpan['end'])
-            exploreAndLog("", replaceSpan)
-        end
+        local replaceSpan = root_capture == "0" and target.span or rootGroup.span
 
         -- now that we have the range to replace all we have to do is set some group indication things (EX: $restcond, $rest, etc..) to their
         -- grouped values.
 
+        print("2")
         local payload = findAndReplaceGroupRequests(patch.payload, patch, exec)
-        findAndReplaceGroupRequests(payload)
+        --findAndReplaceGroupRequests(payload)
 
         --
         if isAlphabeticCharacter(string.sub(payload, 1, 1)) then
-            if patch.tagged then
-                --forcePrint(patch.tagged .. "1ST TAGGED PATCH " .. payload .. "DETECTED THE FIRST LETTER AS ALPHA NUMERIC")
-            end
-
-            --local checkLoc = patch.position == 'after' and target.span['end'] or target.span.start
-            local checkLoc = (patch.position == 'after' and replaceSpan['end'] or replaceSpan.start) + offset
+            print('ADD SPACING 1')
+            local checkLoc = (patch.position == 'after' and replaceSpan['end'] or replaceSpan.start) - 1
 
             if isAlphabeticCharacter(string.sub(source, checkLoc, checkLoc)) then
-                if patch.tagged then
-                    --forcePrint(patch.tagged .. "1ST TAGGED PATCH " .. payload .. " OFFSET THE PAYLOAD BY ONE SPACE.")
-                    --forcePrint(patch.tagged .. "1ST TAGGED PATCH CHARACTERS " .. string.sub(source, checkLoc, checkLoc) .. " : " .. string.sub(payload, 1, 1))
-                end
-
                 payload = ' ' .. payload
             end
         end
@@ -232,66 +225,55 @@ function module:apply(patch)
         -- NOTE TO SELF: offsetting code change worked really well with smods but is NOT working well with anything else. REVERT OR FIX!!
 
         if isAlphabeticCharacter(string.sub(payload, #payload, #payload)) then
-            if patch.tagged then
-                --forcePrint(patch.tagged .. "2ND TAGGED PATCH " .. payload .. "DETECTED THE FIRST LETTER AS ALPHA NUMERIC")
-            end
-
-            local checkLoc = (patch.position == 'before' and replaceSpan.start or replaceSpan['end']) + offset
+            print('ADD SPACING 2')
+            local checkLoc = (patch.position == 'before' and replaceSpan.start or replaceSpan['end']) + 1
 
             if isAlphabeticCharacter(string.sub(source, checkLoc, checkLoc)) then
-                if patch.tagged then
-                    --forcePrint(patch.tagged .. "2ND TAGGED PATCH " .. payload .. "DETECTED THE FIRST LETTER AS ALPHA NUMERIC")
-                end
                 payload = payload .. ' '
             end
         end
 
         -- yipe kai yay okay its time to inject it
-        local sub1 = 1 --#root_capture --(root_capture == '0' and 1 or #root_capture-exec.n+1)--1 -- -2      --  #root_capture-exec.n)
-        local sub2 = 1 --(root_capture == '0' and 1 or #root_capture+exec.n-1)--1 -- +2      --  #root_capture-exec.n)
+        --local sub1 = 1 --#root_capture --(root_capture == '0' and 1 or #root_capture-exec.n+1)--1 -- -2      --  #root_capture-exec.n)
+        --local sub2 = 1 --(root_capture == '0' and 1 or #root_capture+exec.n-1)--1 -- +2      --  #root_capture-exec.n)
+
+        print("3")
 
         -- spagetti code
         if patch.position == 'at' then
-            history = history .. 'at '
-            payload = payload .. '--[=======[' .. tostring(offset) .. ' ' .. history .. ' ]=======]'
-
-            source = string.sub(source, 1, replaceSpan.start - sub1 + offset - offset2)--2)
+            source = string.sub(source, 1, replaceSpan.start_ - 1)--2)
                     .. payload
-                    .. string.sub(source, replaceSpan['end'] + sub2 + offset - offset2)
+                    .. string.sub(source, replaceSpan.end_ + 1)
 
-            offset = replaceSpan['end'] + sub2 + offset + #payload -- offset2/2 + #payload
-            --offset2 = offset2 + 1
-            offset2 = 1
-            if offset2 > 2 then
-                offset2 = 1
-            end
-            --offset = replaceSpan['end'] + sub2 + offset --+ #payload - (1*iter) -- - 1
         elseif patch.position == 'before' then
-            history = history .. 'before '
-            payload = payload .. '--[=======[' .. tostring(offset) .. ' ' .. history .. ' ]=======]'
-
-            source = string.sub(source, 1, replaceSpan.start - sub1 + offset)
+            source = string.sub(source, 1, replaceSpan.start_)
                     .. payload
-                    .. string.sub(source, replaceSpan.start + offset)
+                    .. string.sub(source, replaceSpan.start_ + 1)
 
-            offset = replaceSpan['end'] + offset + #payload + sub1
         elseif patch.position == 'after' then
-            history = history .. 'after '
-            payload = payload .. '--[=======[' .. tostring(offset) .. ' ' .. history .. ' ]=======]'
-
-            source = string.sub(source, 1, replaceSpan['end'] + offset)
+            source = string.sub(source, 1, replaceSpan.end_ + offset)
                     .. payload
-                    .. string.sub(source, replaceSpan['end'] + 1 + offset)
+                    .. string.sub(source, replaceSpan.end_ + 1)
 
-            offset = replaceSpan['end'] + 1 + offset + #payload + 1 -- - 1
+            --offset = replaceSpan['end'] + 1 + offset + #payload + 1 -- - 1
             --offset = offset - 1
         end
 
-        --offset = replaceSpan['end'] + sub2 + offset--replaceSpan['end']
+        print("4")
 
+        --offset = replaceSpan['end'] + sub2 + offset--replaceSpan['end']
+        --print('setsource')
         file.setSource(source)
+
+        ::continue::
     end
+
+
+    --print(newRe)
+    --print({file.getSource()})
 end
+
+
 
 
 return module
