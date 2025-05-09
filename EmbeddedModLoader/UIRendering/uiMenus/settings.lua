@@ -158,7 +158,9 @@ _G.MenuSettings = defaultSettings
 -- load settings
 local settings = readSavedSettings()
 for i, v in pairs(settings) do
-    _G.MenuSettings[i].Value = v
+    if _G.MenuSettings[i] then
+        _G.MenuSettings[i].Value = v
+    end
 end
 
 
