@@ -43,7 +43,7 @@ end
 -- a very unfortunate method
 
 local function Exists(path, target)
-    for _, name in ipairs(love.filesystem.getDirectoryItems(path)) do
+    for _, name in ipairs(FILESYSTEM.getDirectoryItems(path)) do
         if string.lower(name) == target then
             return name
         end
@@ -69,7 +69,7 @@ local function getULPath(path, offset)
 
         -- case sensitive takes precedence
         local check = currentPath .. (i == 1 and "" or "/")
-        if FILESYSTEM.exists(check) then
+        if Exists(check) then
             currentPath = check .. name
             goto continue
         end
@@ -87,8 +87,6 @@ local function getULPath(path, offset)
         end
 
         -- stop here, we will return false because we couldnt get a upper or lower name
-
-
         :: continue ::
     end
 

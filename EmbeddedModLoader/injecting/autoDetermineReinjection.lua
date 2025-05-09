@@ -90,9 +90,19 @@ end
 
 -- // [[
 function module.determineReinjection()
-    if not love.filesystem.getInfo(modsListCachePath) or not _G.MenuSettings.OverwriteAutoReinjection.Value then
+    if not love.filesystem.getInfo(modsListCachePath) then
         writeNewestChanges(collectMods())
+
+        -- first inject
         return true
+    end
+
+
+    if not _G.MenuSettings.OverwriteAutoReinjection.Value then
+        writeNewestChanges(collectMods())
+
+        -- determined based on if the user says we should re-inject or not
+        return _G.MenuSettings.LoadUsingIndexedFiles.Value
     end
 
     local currentlyInstalledMods = collectMods()
