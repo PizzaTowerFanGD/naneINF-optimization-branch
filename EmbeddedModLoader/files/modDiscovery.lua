@@ -67,9 +67,19 @@ for _, directory in pairs(modDirectories) do
     local method = directory[1]
     local path = directory[2]
 
-    for _, mod in pairs(fileHandler.exploreFolder(path, method) ) do
+    local modsFolder = fileHandler.exploreFolder(path, method)
+
+    -- 5/8/2025, ive entirely forgot that this feature in lovely existed.
+    -- meaning that for months you couldnt disable a mod at all LOL
+    if modsFolder['.lovelyignore'] then
+        goto skipFolder
+    end
+
+    for _, mod in pairs( fileHandler.exploreFolder(path, method) ) do
         table.insert(mods, {method, mod})
     end
+
+    :: skipFolder ::
 end
 
 
