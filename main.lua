@@ -55,6 +55,11 @@ function writeToFile(...)
 end
 
 
+function error(...)
+    return forcePrint(...)
+end
+
+
 -- forces a print
 function forcePrint(str)
     if not str then
@@ -177,9 +182,15 @@ function _G.LoadGame()
         v:stop()
     end
 
+    -- if we have this enabled we will overwrite love.filesystem entirely
+    -- this is a bugfix for many texture packs and mods on iOS.
+    if _G.MenuSettings.EnforceInsensitiveFilesystem.Value == true then
+        love.filesystem = require(path .. 'injecting/loveOverwrites/filesystem')
+    end
+
+    -- everything is ready, lets launch!!!!
     _G.CurrentLog = "PostLaunch-"
 
     local superRun = require("originalmain")
     love.run()
-    --local smods = require('mods/smods/src/core')
 end

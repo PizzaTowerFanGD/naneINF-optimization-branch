@@ -6,6 +6,24 @@ mainMenu.screen = nil
 local imgs = {}
 local num = 0
 
+local function readSavedSettings()
+    local settings = {}
+
+    if love.filesystem.getInfo('patched') and love.filesystem.getInfo('patched/savedSettings.lua') then
+        local saved
+
+        local succ, err = pcall(function()
+            saved, error = load(love.filesystem.read('patched/savedSettings.lua'))()
+        end)
+
+        if succ then
+            settings = saved
+        end
+    end
+
+    return settings
+end
+
 local function addIconButton(text, icon, x, y, width, height, color, uO)
     -- // ADD BUTTONS
 
@@ -96,11 +114,12 @@ local defaultSettings = {
         Value = true
     },]]
 
-    DisplayDebugInjectionInfo = {
+    -- Was never implemented, may be re-introduced.
+    --[[DisplayDebugInjectionInfo = {
         Name = "Display Debug Injection Info [NW]",
         Category = "Debug",
         Value = true
-    },
+    },]]
 
     WriteToLogs = {
         Name = "Write To Logs File patched/logs.txt (in save directory) WILL CAUSE MAJOR PERFORMANCE HITS",
@@ -120,6 +139,12 @@ local defaultSettings = {
         Value = true,
     },
 
+    EnforceInsensitiveFilesystem = {
+        Name = "Enforce Case-Insensitive File System. (Can fix some mods on IOS/iPhone)",
+        Category = "General",
+        Value = false,
+    },
+
     ModsEnabled = {
         Name = "Mods Enabled",
         Category = "General",
@@ -127,11 +152,44 @@ local defaultSettings = {
     },
 }
 
--- todo, change to load and use settings
+-- set settings to the current default, and overwrite values with the saved ones (if they exist.)
 _G.MenuSettings = defaultSettings
+
+-- load settings
+local settings = readSavedSettings()
+for i, v in pairs(settings) do
+    _G.MenuSettings[i].Value = v
+end
+
+
+
+
+
+
+-- // ACTUAL UI CODE
+
 
 
 local pathObjects = {}
+
+
+local function writeChanges()
+    local str = "return {"
+
+    -- ensure patched and injectionCache folders both exist.
+    if not love.filesystem.getInfo('patched') then
+        love.filesystem.createDirectory('patched')
+    end
+
+    for i, v in pairs(_G.MenuSettings) do
+        str = str .. '[ [[' .. i .. "]] ] = " .. tostring(v.Value) .. ", "
+    end
+
+    str = string.sub(str, 1, #str-2) .. "}"
+
+    love.filesystem.write("patched/savedSettings.lua", str)
+end
+
 
 function mainMenu:setup(library)
     self.screen = library.screen()
@@ -232,6 +290,8 @@ function mainMenu:setup(library)
             --_G.MenuSettings[i].Value = v.Value
 
             playSFX("toggle", nil, true)
+
+            writeChanges()
         end
     end
 
