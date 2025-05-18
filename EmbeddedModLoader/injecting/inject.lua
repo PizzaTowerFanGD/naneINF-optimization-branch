@@ -143,6 +143,8 @@ function inject.sort(tomlFiles)
     local list = {}
 
     for priority, data in ipairs(tomlFiles) do
+        forcePrint("IPAIRS: " .. priority .. " : " .. data.manifest.__NAME )
+
         local patches = data.patches
 
         -- manifest
@@ -171,6 +173,12 @@ function inject.sort(tomlFiles)
         module = 4
     }
 
+    for i, v in pairs(list) do
+        for ind, patch in ipairs(v) do
+            forcePrint("BEFORESORT: " .. ind .. " : " .. patch.__NAME)
+        end
+    end
+
     -- Lovely loads patches in order of their patch type, and then uses priority to load specified patches.
     for i, v in pairs(list) do
         -- now we actually fix the priorities by sorting this list by the priorities
@@ -188,6 +196,12 @@ function inject.sort(tomlFiles)
 
             return test1 < test2--(a.__PRIORITY or -999999) < (b.__PRIORITY or -999999)  --test1 < test2
         end)
+    end
+
+    for i, v in pairs(list) do
+        for ind, patch in ipairs(v) do
+            forcePrint("AFTERSORT: " .. ind .. " : " .. patch.__NAME)
+        end
     end
 
     return list

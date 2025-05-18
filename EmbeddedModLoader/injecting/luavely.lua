@@ -105,9 +105,7 @@ for i, v in pairs(lovelyTomlFiles) do
     forcePrint(v.manifest.__NAME)
 end
 
-print("the true length of tomlFileList is: " .. len)
-
-luavely.lovelyTomlFiles = lovelyTomlFiles
+forcePrint("the true length of tomlFileList is: " .. len)
 
 -- offset the priorites by the lowest found priority so we can actually read EVERY file
 local lowestOffset = math.huge
@@ -116,41 +114,53 @@ local lowestOffset = math.huge
 -- multithreading is now forced (absolutely no reason to not use it)
 local injecting = require("EmbeddedModLoader/injecting/inject") --(_G.MenuSettings.LoadUsingMultiThreading.Value and '/WIP_threading' or '') .. "/inject")
 
+
+
+local function sort(table_)
+    local sorted = {}
+    local placement = 1
+
+    local continuing = true
+
+    while continuing do
+        local index = -math.huge
+        local value = math.huge
+
+        for i, v in pairs(table_) do
+            if v.manifest.priority < value then
+                value = v.manifest.priority
+                index = i
+            end
+        end
+
+        if index == -math.huge then
+            break
+        end
+
+        sorted[placement] = table_[index]
+        table_[index] = nil -- remove from the table
+        placement = placement + 1
+    end
+
+    return sorted
+end
+
+
+
 -- we MUST use ipairs here, which stops at the first nil value which ALSO means it could skip some files, so we sort and change the priorities to be linear
-table.sort(lovelyTomlFiles, function(a, b)
-    if lowestOffset > a.manifest.priority then
-        lowestOffset = a.manifest.priority
-    end
-    if lowestOffset > b.manifest.priority then
-        lowestOffset = b.manifest.priority
-    end
+-- table.sort doesnt work when we have negative values, heres my inefficent selection sort
 
-    return a.manifest.priority < b.manifest.priority
-end)
+lovelyTomlFiles = sort(lovelyTomlFiles)
 
--- this should never happen, but just in case.
---if lowestOffset >= 0 then
-    --lowestOffset = 1
---end
-
-forcePrint("Lowest Offset: " .. lowestOffset)
-
-local newLovelyTomls = {}
-
-for i, v in pairs(lovelyTomlFiles) do
-    newLovelyTomls[i + math.abs(lowestOffset-1)] = v
-end
-
-lovelyTomlFiles = newLovelyTomls
-
-for i, v in pairs(lovelyTomlFiles) do
-    v.priority = i + math.abs(lowestOffset-1)
-
-    print(v.manifest.__NAME)
-end
+-- change priorities
+--[[for i, v in pairs(lovelyTomlFiles) do
+    v.priority = i
+end]]
 
 -- now that these are fixed it should be safe to inject
 
+luavely.lovelyTomlFiles = lovelyTomlFiles
 injecting.start(lovelyTomlFiles)
+
 
 return luavely
