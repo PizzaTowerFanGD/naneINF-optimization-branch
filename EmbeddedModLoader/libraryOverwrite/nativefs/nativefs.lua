@@ -151,21 +151,28 @@ end
 
 -- IM MAKING A CUSTOM NATIVEFS MODULE.
 function nativefs.getDirectoryItems(path)
-    -- lists files in your game's save directory, NOT your .exe directory
-    --love.filesystem.setIdentity("Balatro")
-
     local files = {}
 
-    print("[NATIVEFS] PATH PROVIDED: " .. nativefs.getWorkingDirectory() .. path)
+    --print("[NATIVEFS] PATH PROVIDED: " .. nativefs.getWorkingDirectory() .. path)
     for i, v in pairs(love.filesystem.getDirectoryItems(nativefs.getWorkingDirectory() .. path)) do
-        print("FOUND: " .. v)
         table.insert(files, v)
+        --print("FOUND: " .. v)
     end
 
-    print("FOUND A TOTAL OF " .. #files .. " FILES.")
+    --print("FOUND A TOTAL OF " .. #files .. " FILES.")
 
     return files
 end
+
+function nativefs.getDirectoryItemsInfo(path)
+    local fileNames = nativefs.getDirectoryItems(path)
+    local returnTable = {}
+
+    for i, v in fileNames do
+        table.insert(returnTable, nativefs.getInfo(path .. '/' .. v))
+    end
+end
+
 
 
 function nativefs.createDirectory(path)
@@ -184,6 +191,7 @@ function nativefs.load(name)
 
     return loadedCode, err
 end
+
 
 
 
