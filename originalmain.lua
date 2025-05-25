@@ -55,13 +55,13 @@ function love.run()
 				end
 				if name == 'touchpressed' then
 					touched = true
-				elseif name == 'mousepressed' then
+				elseif name == 'mousepressed' then 
 					_n,_a,_b,_c,_d,_e,_f = name,a,b,c,d,e,f
 				else
 					love.handlers[name](a,b,c,d,e,f)
 				end
 			end
-			if _n then
+			if _n then 
 				love.handlers['mousepressed'](_a,_b,_c,touched)
 			end
 		end
@@ -78,18 +78,18 @@ function love.run()
 		end
 
 		run_time = math.min(love.timer.getTime() - run_time, 0.1)
-		p_ww, p_hh, p_wflags = love.window.getMode()
-		G.FPS_CAP = p_wflags['refreshrate']
+        p_ww, p_hh, p_wflags = love.window.getMode()
+        G.FPS_CAP = p_wflags['refreshrate']
 		if run_time < 1./G.FPS_CAP then love.timer.sleep(1./G.FPS_CAP - run_time) end
 	end
 end
 
-function love.load()
+function love.load() 
 	G:start_up()
 	--Steam integration
-	local os = love.system.getOS()
-	love.window.setMode(2, 1, {highdpi = true})
-	if os == 'OS X' or os == 'Windows' then
+    local os = love.system.getOS()
+    love.window.setMode(2, 1, {highdpi = true})
+	if os == 'OS X' or os == 'Windows' then 
 		local st = nil
 		--To control when steam communication happens, make sure to send updates to steam as little as possible
 		if os == 'OS X' then
@@ -127,13 +127,13 @@ end
 
 function love.update( dt )
 	--Perf monitoring checkpoint
-	timer_checkpoint(nil, 'update', true)
-	G:update(dt)
+    timer_checkpoint(nil, 'update', true)
+    G:update(dt)
 end
 
 function love.draw()
 	--Perf monitoring checkpoint
-	timer_checkpoint(nil, 'draw', true)
+    timer_checkpoint(nil, 'draw', true)
 	G:draw()
 end
 
@@ -156,20 +156,20 @@ end
 function love.gamepadpressed(joystick, button)
 	button = G.button_mapping[button] or button
 	G.CONTROLLER:set_gamepad(joystick)
-	G.CONTROLLER:set_HID_flags('button', button)
-	G.CONTROLLER:button_press(button)
+    G.CONTROLLER:set_HID_flags('button', button)
+    G.CONTROLLER:button_press(button)
 end
 
 function love.gamepadreleased(joystick, button)
 	button = G.button_mapping[button] or button
-	G.CONTROLLER:set_gamepad(joystick)
-	G.CONTROLLER:set_HID_flags('button', button)
-	G.CONTROLLER:button_release(button)
+    G.CONTROLLER:set_gamepad(joystick)
+    G.CONTROLLER:set_HID_flags('button', button)
+    G.CONTROLLER:button_release(button)
 end
 
 function love.mousepressed(x, y, button, touch)
-	G.CONTROLLER:set_HID_flags(touch and 'touch' or 'mouse')
-	if button == 1 then
+    G.CONTROLLER:set_HID_flags(touch and 'touch' or 'mouse')
+    if button == 1 then 
 		G.CONTROLLER:queue_L_cursor_press(x, y)
 	end
 	if button == 2 then
@@ -179,7 +179,7 @@ end
 
 
 function love.mousereleased(x, y, button)
-	if button == 1 then G.CONTROLLER:L_cursor_release(x, y) end
+    if button == 1 then G.CONTROLLER:L_cursor_release(x, y) end
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
@@ -187,21 +187,21 @@ function love.mousemoved(x, y, dx, dy, istouch)
 	if next(love.touch.getTouches()) ~= nil then
 		G.CONTROLLER.last_touch_time = G.TIMERS.UPTIME
 	end
-	G.CONTROLLER:set_HID_flags(G.CONTROLLER.last_touch_time > G.TIMERS.UPTIME - 0.2 and 'touch' or 'mouse')
+    G.CONTROLLER:set_HID_flags(G.CONTROLLER.last_touch_time > G.TIMERS.UPTIME - 0.2 and 'touch' or 'mouse')
 end
 
 function love.joystickaxis( joystick, axis, value )
-	if math.abs(value) > 0.2 and joystick:isGamepad() then
+    if math.abs(value) > 0.2 and joystick:isGamepad() then
 		G.CONTROLLER:set_gamepad(joystick)
-		G.CONTROLLER:set_HID_flags('axis')
-	end
+        G.CONTROLLER:set_HID_flags('axis')
+    end
 end
 
 function love.errhand(msg)
 	if G.F_NO_ERROR_HAND then return end
 	msg = tostring(msg)
 
-	if G.SETTINGS.crashreports and _RELEASE_MODE and G.F_CRASH_REPORTS then
+	if G.SETTINGS.crashreports and _RELEASE_MODE and G.F_CRASH_REPORTS then 
 		local http_thread = love.thread.newThread([[
 			local https = require('https')
 			CHANNEL = love.thread.getChannel("http_channel")
@@ -223,7 +223,7 @@ function love.errhand(msg)
 			str = str:gsub("\n", "\r\n"):gsub("([^%w _%%%-%.~])", char_to_hex):gsub(" ", "+")
 			return str
 		end
-
+		
 
 		local error = msg
 		local file = string.sub(msg, 0,  string.find(msg, ':'))
@@ -241,7 +241,7 @@ function love.errhand(msg)
 				function_line = string.sub(l, string.find(l, 'in function')+12)..' line:'..function_line
 			end
 
-			if boot_found and func_found then
+			if boot_found and func_found then 
 				trace = trace..l..'\n'
 			end
 		end
@@ -281,8 +281,8 @@ function love.errhand(msg)
 
 
 	local p = 'Oops! Something went wrong:\n'..msg..'\n\n'..(not _RELEASE_MODE and debug.traceback() or G.SETTINGS.crashreports and
-			'Since you are opted in to sending crash reports, LocalThunk HQ was sent some useful info about what happened.\nDon\'t worry! There is no identifying or personal information. If you would like\nto opt out, change the \'Crash Report\' setting to Off' or
-			'Crash Reports are set to Off. If you would like to send crash reports, please opt in in the Game settings.\nThese crash reports help us avoid issues like this in the future')
+		'Since you are opted in to sending crash reports, LocalThunk HQ was sent some useful info about what happened.\nDon\'t worry! There is no identifying or personal information. If you would like\nto opt out, change the \'Crash Report\' setting to Off' or
+		'Crash Reports are set to Off. If you would like to send crash reports, please opt in in the Game settings.\nThese crash reports help us avoid issues like this in the future')
 
 	local function draw()
 		local pos = love.window.toPixels(70)
@@ -339,7 +339,7 @@ function love.resize(w, h)
 		G.ROOM.T.w = G.TILE_W
 		G.ROOM.T.h = G.TILE_H
 		G.ROOM_ATTACH.T.w = G.TILE_W
-		G.ROOM_ATTACH.T.h = G.TILE_H
+		G.ROOM_ATTACH.T.h = G.TILE_H		
 
 		if w/h < G.window_prev.orig_ratio then
 			G.ROOM.T.x = G.ROOM_PADDING_W
@@ -350,10 +350,10 @@ function love.resize(w, h)
 		end
 
 		G.ROOM_ORIG = {
-			x = G.ROOM.T.x,
-			y = G.ROOM.T.y,
-			r = G.ROOM.T.r
-		}
+            x = G.ROOM.T.x,
+            y = G.ROOM.T.y,
+            r = G.ROOM.T.r
+        }
 
 		if G.buttons then G.buttons:recalculate() end
 		if G.HUD then G.HUD:recalculate() end
@@ -361,7 +361,7 @@ function love.resize(w, h)
 
 	G.WINDOWTRANS = {
 		x = 0, y = 0,
-		w = G.TILE_W+2*G.ROOM_PADDING_W,
+		w = G.TILE_W+2*G.ROOM_PADDING_W, 
 		h = G.TILE_H+2*G.ROOM_PADDING_H,
 		real_window_w = w,
 		real_window_h = h
