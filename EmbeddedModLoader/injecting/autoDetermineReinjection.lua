@@ -27,6 +27,11 @@ local function writeNewestChanges(mods)
 
     str = string.sub(str, 1, #str-2) .. "}"
 
+    -- fixes error caused by loading with no mods enabled
+    if (mods.__NumberOfMods == 0) then
+        str = "return {}"
+    end
+
     love.filesystem.write(modsListCachePath, str)
 end
 
