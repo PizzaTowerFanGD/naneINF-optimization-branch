@@ -5,6 +5,7 @@ This set of instructions is for installation of the modloader on Android devices
 * Access to a Mac/Windows/Linux PC
 * Balatro Mobile Maker: https://github.com/blake502/balatro-mobile-maker
 * A Steam copy of Balatro installed.
+* Shizuku installed on you Android device (For Android 12+) 
 
 ## Balatro Mobile Maker
 1. Download the latest exe release of Balatro Mobile Maker and run the EXE file.
@@ -27,9 +28,8 @@ Now that we have BMM Balatro installed on your phone, we will now install the Mo
 6. Now you can start adding mods in the mods folder! (smods alongside other mods) Keep in mind that it may take a while to load as lovely isn't being used
 
 ## Can't access android/data folder?
-This is due to an android limitation, later android versions (12+) restrict android/data access, so you need to either root your device or use shizuku to make it accessible
+This is due to an android limitation, later android versions (12+) restrict android/data access, so you need to either root your device or use shizuku to make it accessible on file explorers like Zarchiver.
 You can read more about it [here](https://zdevs.ru/en/za/android_data_obb.html)
-
 [Shizuku Setup instructions](https://shizuku.rikka.app/guide/setup/)
 
 
