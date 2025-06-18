@@ -22,7 +22,7 @@ Now that we have BMM Balatro installed on your phone, we will now install the Mo
 **The rest of these instructions will be followed on your phone.**
 1. You should launch the game first, so that a save folder is created
 2. Download the latest Mod Loader release from this github page
-3. Now go onto your File Explorer app, I recommend ZArchiver
+3. Now go onto your File Explorer app
 4. Extract the Zip File, and drag both the "originalmain.lua", "main.lua" and "EmbeddedModLoader" into *android/data/com.unofficial.balatro/file/save/game* 
 5. Launch the game, the mods folder will be created automatically
 6. Now you can start adding mods in the mods folder! (smods alongside other mods) Keep in mind that it may take a while to load as lovely isn't being used
