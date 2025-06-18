@@ -5,7 +5,7 @@ This set of instructions is for installation of the modloader on Android devices
 * Access to a Mac/Windows/Linux PC
 * Balatro Mobile Maker: https://github.com/blake502/balatro-mobile-maker
 * A Steam copy of Balatro installed.
-* Shizuku installed on you Android device (For Android 12+) 
+* Shizuku setup on you Android device (For Android 12+) 
 
 ## Balatro Mobile Maker
 1. Download the latest exe release of Balatro Mobile Maker and run the EXE file.
