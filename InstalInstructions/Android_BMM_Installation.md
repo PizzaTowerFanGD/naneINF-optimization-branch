@@ -11,7 +11,7 @@ This set of instructions is for installation of the modloader on Android devices
 2. If Balatro is installed, BMM should be prompting you to build for Android & iOS
 3. It should start asking you want to apply suggested patches (e.g. *Would you like to apply FPS Cap?*) Stop here.
 4. What you need to do now is edit the "conf.lua" file which is located in a folder called "Balatro" in the directory of where your BMMM EXE file is located.
-5. You should add the line *t.externalstorage = true* and save the file (This makes the save location in the *android/data folder rather* than the root folder
+5. You should add the line *t.externalstorage = true* and save the file (This makes the save location in the *android/data* folder rather than the root folder)
 6. You can now continue the rest of the installation as normal and install the balatro.apk onto your android device.
 
 
@@ -27,8 +27,8 @@ Now that we have BMM Balatro installed on your phone, we will now install the Mo
 6. Now you can start adding mods in the mods folder! (smods alongside other mods) Keep in mind that it may take a while to load as lovely isn't being used
 
 ## Can't access android/data folder?
-*In Android 11 and 12, folders can be accessed by granting access. Refer to the instruction page for more information. Starting with Android 13, the restrictions have become stricter.*
-This is due to an android limitation, newer android versions restrict android/data access, so you need to either root your device or use shizuku to make it accessible on file explorers like Zarchiver.
+*In Android 11 and 12, folders can be accessed by granting access. Starting with Android 13, the restrictions have become stricter.*
+This is an android limitation, newer android versions restrict android/data access, so you need to either root your device or use shizuku to make it accessible on file explorers like Zarchiver.
 You can read more about it [here](https://zdevs.ru/en/za/android_data_obb.html)
 
 [Shizuku Setup instructions](https://shizuku.rikka.app/guide/setup/)
