@@ -10,7 +10,7 @@ This set of instructions is for installation of the modloader on Android devices
 ## Balatro Mobile Maker
 1. Download the latest exe release of Balatro Mobile Maker and run the EXE file.
 2. If Balatro is installed, BMM should be prompting you to build for Android & iOS.
-3. It should start asking you to apply some patches (e.g. *Would you like to apply FPS Cap?*) Stop here.
+3. It should start asking you to apply some patches, as shown below. Stop here.
 ![image](https://github.com/user-attachments/assets/f749c390-f743-45be-abdc-08306951dab7)
 4. You now need to edit the "conf.lua" file which is located in a folder called "*Balatro*" in the directory of where your BMMM EXE is located.
 ![confluafile](https://github.com/user-attachments/assets/07606796-b4ac-4747-8c38-54db2e898bd0)
