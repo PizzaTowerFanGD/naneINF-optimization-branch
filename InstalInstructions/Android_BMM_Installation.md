@@ -28,7 +28,7 @@ Now that we have BMM Balatro installed on your phone, we will now install the Mo
 
 ## Can't access android/data folder?
 *In Android 11 and 12, folders can be accessed by granting access. Refer to the instruction page for more information. Starting with Android 13, the restrictions have become stricter.*
-This is due to an android limitation, later android versions (12+) restrict android/data access, so you need to either root your device or use shizuku to make it accessible on file explorers like Zarchiver.
+This is due to an android limitation, newer android versions restrict android/data access, so you need to either root your device or use shizuku to make it accessible on file explorers like Zarchiver.
 You can read more about it [here](https://zdevs.ru/en/za/android_data_obb.html)
 
 [Shizuku Setup instructions](https://shizuku.rikka.app/guide/setup/)
