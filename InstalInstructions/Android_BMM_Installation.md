@@ -20,6 +20,7 @@ This set of instructions is for installation of the modloader on Android devices
 
 * **The rest of these instructions will be followed on your phone.**
 # Accessing Balatro Save Location
+We now need to follow the following steps in order for us to be able to edit the save file location
 1. Hold the icon of the Balatro app, and press "App Info"
 2. Then clear the game's cache and storage
 ![image](https://github.com/user-attachments/assets/0c14031d-8d98-421a-8d6e-920dda21c0a2)
@@ -40,7 +41,7 @@ Now that we have the folders set up, we will now install the ModLoader onto Bala
 
 ## Can't access android/data folder?
 *In Android 11 and below, folders can be accessed by granting access. Starting with Android 12, the restrictions have become stricter.*
-This is an android limitation, newer android versions restrict android/data access, so you need to either root your device or use shizuku to make it accessible on file explorers like Zarchiver.
+This is an android limitation, newer android versions restrict android/data access, so you need to either root your device or use shizuku to make it accessible on file explorers like MiXplorer.
 You can read more about it [here](https://zdevs.ru/en/za/android_data_obb.html)
 
 [Shizuku Setup instructions](https://shizuku.rikka.app/guide/setup/)
