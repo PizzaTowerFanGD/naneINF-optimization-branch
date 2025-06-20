@@ -27,7 +27,7 @@ We now need to follow the following steps in order for us to be able to edit the
 3. Then you go to *android/data/com.unofficial.balatro*, it should now be empty.
 4. Create the following folders in this order:
    "files" -> "save" -> "game"
-5. Now your folder structure should look like "*android/datacom.unofficial.balatro/files/save/game*"
+5. Now your folder structure should look like "*android/data/com.unofficial.balatro/files/save/game*"
 6. Launch the game, this will create a save file.
 
 
