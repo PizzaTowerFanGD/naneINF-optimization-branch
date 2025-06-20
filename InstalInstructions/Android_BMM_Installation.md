@@ -27,7 +27,7 @@ This set of instructions is for installation of the modloader on Android devices
 4. Create the following folders in this order:
    "files" -> "save" -> "game"
 5. Now your folder structure should look like "*android/datacom.unofficial.balatro/files/save/game*"
-6. Now you can run Balatro to create a save
+6. Launch the game, this will create a save file.
 
 
 # Modloader Installation
