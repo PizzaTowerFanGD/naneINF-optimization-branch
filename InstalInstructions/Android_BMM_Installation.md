@@ -1,4 +1,3 @@
-
 # naneINF Mobile Installation (Android)
 This set of instructions is for installation of the modloader on Android devices
 
@@ -23,7 +22,7 @@ This set of instructions is for installation of the modloader on Android devices
 # Accessing Balatro Save Location
 1. Hold the icon of the Balatro app, and press "App Info"
 2. Then clear the game's cache and storage
-![image](https://github.com/user-attachments/assets/147750b7-6ee0-4d53-a6db-636a222d9dad)
+![image](https://github.com/user-attachments/assets/0c14031d-8d98-421a-8d6e-920dda21c0a2)
 3. Then you go to *android/data/com.unofficial.balatro*, it should now be empty.
 4. Create the following folders in this order:
    "files" -> "save" -> "game"
