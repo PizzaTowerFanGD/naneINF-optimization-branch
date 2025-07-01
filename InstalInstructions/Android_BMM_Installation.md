@@ -27,7 +27,7 @@ We now need to follow the following steps in order for us to be able to edit the
 3. Then you go to *android/data/com.unofficial.balatro*, it should now be empty.
 4. Create the following folders in this order:
    "files" -> "save" -> "game"
-     -> "mods","patched"
+     -> "mods" , "patched"
 6. Now your folder structure should look like "*android/data/com.unofficial.balatro/files/save/game*"
  * the game folder should have 2 folders called "mods" and "patched"
 8. Launch the game, this will create a save file.
@@ -39,9 +39,11 @@ Now that we have the folders set up, we will now install the ModLoader onto Bala
 2. Now go onto your File Explorer app
 3. Extract the Zip File, and drag both the "originalmain.lua", "main.lua" and "EmbeddedModLoader" into *android/data/com.unofficial.balatro/file/save/game* 
 4. Launch the game, some folders will now be created
-5. Now you can start adding mods in the mods folder! Keep in mind that it may take a while to load as lovely isn't being used
+5. Now you can start adding mods in the mods folder!
 
-* Note: smods is a requirement for naneINF
+### Disclaimer
+* Keep in mind that it may take a while to load as lovely isn't being used.
+* SMODS is a requirement for naneINF to work properly.
   
 ## Can't access android/data folder?
 *In Android 11 and below, folders can be accessed by granting access. Starting with Android 12, the restrictions have become stricter.*
