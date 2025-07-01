@@ -28,8 +28,8 @@ We now need to follow the following steps in order for us to be able to edit the
 4. Create the following folders in this order:
    "files" -> "save" -> "game"
      -> "mods","patched"
-6. Now your folder structure should look like "*android/data/com.unofficial.balatro/files/save/game/mods*"
- * the game folder should have a folder called "mods" and "patched"
+6. Now your folder structure should look like "*android/data/com.unofficial.balatro/files/save/game*"
+ * the game folder should have 2 folders called "mods" and "patched"
 8. Launch the game, this will create a save file.
 
 
