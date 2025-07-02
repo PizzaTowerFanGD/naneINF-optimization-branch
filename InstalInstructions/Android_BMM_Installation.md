@@ -19,7 +19,7 @@ This set of instructions is for installation of the modloader on Android devices
 6. You can now continue the rest of the installation as normal and install the `balatro.apk` onto your android device!
 
 * **The rest of these instructions will be followed on your phone.**
-# Accessing Balatro Save Location
+## Accessing Balatro Save Location
 We now need to follow the following steps in order for us to be able to edit the save file location
 1. Hold the icon of the Balatro app, and press *App Info*
 2. Then clear the game's cache and storage </br>
