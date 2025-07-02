@@ -41,7 +41,7 @@ Now that we have the folders set up, we will now install the ModLoader onto Bala
 4. Launch the game, some folders will now be created
 5. Now you can start adding mods in the mods folder!
 
-> * Keep in mind that it may take a while to load as lovely isn't being used.
+> * Keep in mind that it may take a while to load as lovely isn't being used natively.
 > * SMODS is a requirement for naneINF to work properly.
   
 ## Can't access android/data folder?
