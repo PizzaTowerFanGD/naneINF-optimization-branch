@@ -9,7 +9,7 @@ This set of instructions is for installation of the modloader on Android devices
 ## Balatro Mobile Maker
 1. Download the latest exe release of Balatro Mobile Maker and run the EXE file.
 2. If Balatro is installed, BMM should be prompting you to build for Android & iOS.
-3. It should start asking you to apply some patches, as shown below. pause here.
+3. It should then start asking you to apply some patches, as shown below - pause here.
 ![image](https://github.com/user-attachments/assets/f749c390-f743-45be-abdc-08306951dab7)
 4. You'll first need to edit the `conf.lua` file. This is located in a folder called `Balatro` in the directory of where your BMM EXE is located.
 ![confluafile](https://github.com/user-attachments/assets/07606796-b4ac-4747-8c38-54db2e898bd0)
@@ -29,7 +29,7 @@ We now need to follow the following steps in order for us to be able to edit the
    `"files" -> "save" -> "game"
      -> "mods" , "patched"`
 6. Your folder structure should now look like `android/data/com.unofficial.balatro/files/save/game`
- * the `game` folder should have 2 folders called `mods` and `patched`
+ * the `game` folder should now have 2 folders called `mods` and `patched`
 8. Launch the game, this will create a save file.
 
 
