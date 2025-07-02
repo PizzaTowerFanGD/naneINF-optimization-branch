@@ -22,7 +22,7 @@ This set of instructions is for installation of the modloader on Android devices
 # Accessing Balatro Save Location
 We now need to follow the following steps in order for us to be able to edit the save file location
 1. Hold the icon of the Balatro app, and press *App Info*
-2. Then clear the game's cache and storage
+2. Then clear the game's cache and storage </br>
 ![image](https://github.com/user-attachments/assets/0c14031d-8d98-421a-8d6e-920dda21c0a2)
 3. Then you go to `android/data/com.unofficial.balatro`, it should now be empty.
 4. Create the following folders in this order:
