@@ -37,7 +37,7 @@ We now need to follow the following steps in order for us to be able to edit the
 Now that we have the folders set up, we will now install the ModLoader onto Balatro, which should be quick and simple.
 1. • Download the latest Mod Loader release from this github page
 2. • Now go onto your File Explorer app
-3. • Extract the Zip File, and drag the `originalmain.lua`, `main.lua` and `EmbeddedModLoader` into `android/data/com.unofficial.balatro/file/save/game` 
+3. • Extract the Zip File, and drag the `originalmain.lua`, `main.lua` and `EmbeddedModLoader` into `android/data/com.unofficial.balatro/files/save/game` 
 4. • Launch the game, some folders will now be created
 5. • Now you can start adding mods in the mods folder!
 
