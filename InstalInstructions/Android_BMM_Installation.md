@@ -15,12 +15,12 @@ This set of instructions is for installation of the modloader on Android devices
 ![confluafile](https://github.com/user-attachments/assets/07606796-b4ac-4747-8c38-54db2e898bd0)
 5. Now, add the line `t.externalstorage = true` and save the file. It should now look something like the image below:
  ![confedit](https://github.com/user-attachments/assets/fed150ef-855e-4cec-9f82-d67edd314312)
-> This makes the save location in the `android/data` folder rather than the root folder
+> This makes the save location in the `android/data` folder rather than the root folder!
 6. You can now continue the rest of the installation as normal and install the `balatro.apk` onto your android device!
 
 * **The rest of these instructions will be followed on your phone.**
 ## Accessing Balatro Save Location
-We now need to follow the following steps in order for us to be able to edit the save file location
+We now need to do the following steps in order for us to be able to make changes to the save file location
 1. Hold the icon of the Balatro app, and press *App Info*
 2. Then clear the game's cache and storage </br>
 ![image](https://github.com/user-attachments/assets/0c14031d-8d98-421a-8d6e-920dda21c0a2)
@@ -28,9 +28,9 @@ We now need to follow the following steps in order for us to be able to edit the
 4. Create the following folders in this order:
    `"files" -> "save" -> "game"
      -> "mods" , "patched"`
-6. Your folder structure should now look like `android/data/com.unofficial.balatro/files/save/game`
+ * Your folder structure should now look like `android/data/com.unofficial.balatro/files/save/game`
  * the `game` folder should now have 2 folders called `mods` and `patched`
-7. Launch the game, this will create a save file.
+5. Launch the game, this will create a save file.
 
 
 # Modloader Installation
