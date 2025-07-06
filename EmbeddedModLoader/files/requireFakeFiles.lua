@@ -31,7 +31,7 @@ function methods.require(path)
     -- require has been loaded, return that instead.
     if path == 'lovely' then
         return {
-            version = 'luavely beta 0.9',
+            version = 'luavely 1.0.somethig',
             mod_dir = "Mods"--love.filesystem.getSaveDirectory()
         }
     end
