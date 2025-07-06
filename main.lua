@@ -57,7 +57,9 @@ end
 
 function error(...)
     forcePrint(...)
-    return error(...)
+    error(...)
+    -- dont return error, that causes loading issues and makes it so pcall doesnt exit properly
+    -- dont know how i managed to cause that to happen but
 end
 
 

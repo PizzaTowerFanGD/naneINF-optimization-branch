@@ -19,7 +19,15 @@ local conf = {
 
 
 love.filesystem.write("patched/logs.txt", "")
-local originalPRINT = print
+--local originalPRINT = print
+
+function consoleWrite(msg)
+    io.write(msg .. "\n")
+    io.flush()
+end
+
+local originalPRINT = consoleWrite
+
 function print(...)
     local v = {...}
     local v1 = v[1]
@@ -72,28 +80,20 @@ end
 
 -- dir to write at
 function nativefs.setWorkingDirectory(directory)
+    love.graphics.present()
+
+    originalPRINT("setWorkingDirectory('" .. directory .. "')")
+
+
     -- debugging for while i work on the modloader, this shouldnt run for anybody who isnt me
     -- remove path so we dont explode
     -- love.filesystem.setIdentity("Balatro")
 
-    print("setWorkingDirectory: " .. tostring(directory))
-
-    print("Save Die: " .. tostring(love.filesystem.getSaveDirectory()))
-
 
     directory = string.gsub(directory, love.filesystem.getSaveDirectory(), "")
 
-
-    print("setcheck1: " .. tostring(#directory >= #love.filesystem.getSaveDirectory())
-    )
-
-    print("setcheck2: " .. string.sub(directory, 1, #love.filesystem.getSaveDirectory()))
-
     if #directory >= #love.filesystem.getSaveDirectory() and string.sub(directory, 1, #love.filesystem.getSaveDirectory()) ==  love.filesystem.getSaveDirectory() then
         directory = string.sub(#love.filesystem.getSaveDirectory()+1, #directory)
-
-        print("SUBSTRING FIX METHOD")
-
     end
 
 
@@ -102,12 +102,17 @@ function nativefs.setWorkingDirectory(directory)
 end
 
 function nativefs.getWorkingDirectory()
-    print('getWorkingDirectory Called.')
-    print("Returning: " .. conf.workingDir)
+    originalPRINT("getWorkingDirectory()  ->  " .. conf.workingDir)
+
+    love.graphics.present()
+
     return conf.workingDir
 end
 
 function nativefs.getInfo(path)
+    originalPRINT("getInfo('" .. path .. "')")
+
+    love.graphics.present()
     print(nativefs.getWorkingDirectory() .. path)
     local data = love.filesystem.getInfo(path) --  love.filesystem.getInfo(nativefs.getWorkingDirectory() .. path)
 
@@ -122,11 +127,15 @@ function nativefs.getInfo(path)
 end
 
 function nativefs.newFileData(...)
+    originalPRINT("newFileData('" .. tostring(...) .. "')")
+    love.graphics.present()
     print("NFS NEW FILE DATA: ".. tostring(...))
     return love.filesystem.newFileData(...)
 end
 
 function nativefs.read(path, bypassWorkingDirectory)
+    originalPRINT("read('" .. path .. "', " .. tostring(bypassWorkingDirectory) .. "')")
+    love.graphics.present()
     if path == "mods/smods/localization/default.lua" then
         path = "mods/smods/localization/en-us.lua"
     end
@@ -135,10 +144,14 @@ function nativefs.read(path, bypassWorkingDirectory)
 end
 
 function nativefs.write(path, contents)
+    originalPRINT("write('" .. path .. "', <contents>)")
+    love.graphics.present()
     return love.filesystem.write(nativefs.getWorkingDirectory() .. path, contents)
 end
 
 function nativefs.remove(...)
+    originalPRINT("remove('" .. tostring(...) .. "')")
+    love.graphics.present()
     return love.filesystem.remove(...)
 end
 
@@ -151,6 +164,8 @@ end
 
 -- IM MAKING A CUSTOM NATIVEFS MODULE.
 function nativefs.getDirectoryItems(path)
+    originalPRINT("getDirectoryItems('" .. path .. "')")
+    love.graphics.present()
     local files = {}
 
     --print("[NATIVEFS] PATH PROVIDED: " .. nativefs.getWorkingDirectory() .. path)
@@ -165,17 +180,23 @@ function nativefs.getDirectoryItems(path)
 end
 
 function nativefs.getDirectoryItemsInfo(path)
+    originalPRINT("getDirectoryItemsInfo('" .. path .. "')  ---------------------------------- RETURNS NOTHING FIx IT")
+    love.graphics.present()
     local fileNames = nativefs.getDirectoryItems(path)
     local returnTable = {}
 
     for i, v in fileNames do
         table.insert(returnTable, nativefs.getInfo(path .. '/' .. v))
     end
+
+    --return returnTable
 end
 
 
 
 function nativefs.createDirectory(path)
+    originalPRINT("createDirectory('" .. path .. "')")
+    love.graphics.present()
     return love.filesystem.createDirectory(nativefs.getWorkingDirectory() .. path )
 end
 
@@ -184,6 +205,8 @@ end
 -- this is used by tailsman!
 -- returns a function and a string with an error message (or nil if we didnt encounter an error loading the file)
 function nativefs.load(name)
+    originalPRINT("load('" .. name .. "')")
+    love.graphics.present()
     local loadedCode
     local success, err = pcall(function()
         loadedCode = load(nativefs.read(name, true))
