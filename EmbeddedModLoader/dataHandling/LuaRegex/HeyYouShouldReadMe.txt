@@ -1,3 +1,11 @@
+NOTE FROM 3XPL ON JULY 5 2025
+
+NONE OF THIS IS RELEVANT ANYMORE AND HAS BEEN FIXED
+
+
+
+
+
 NOTE FROM 3XPL ON APRIL 23 2025
 this regex module has issues with detecting the range of the matches it actually finds (which is kinda funny)
 this is a VERY heavily editted version of https://github.com/Roblox/luau-regexp/tree/main to move it from luau to luajit

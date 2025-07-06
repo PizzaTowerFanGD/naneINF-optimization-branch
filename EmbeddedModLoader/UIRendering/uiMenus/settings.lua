@@ -13,7 +13,7 @@ local function readSavedSettings()
         local saved
 
         local succ, err = pcall(function()
-            saved, error = load(love.filesystem.read('patched/savedSettings.lua'))()
+            saved, errro = load(love.filesystem.read('patched/savedSettings.lua'))()
         end)
 
         if succ then
@@ -120,6 +120,12 @@ local defaultSettings = {
         Category = "Debug",
         Value = true
     },]]
+
+    ConfigPatching = {
+        Name = "Automatically Patch Mod Config Files",
+        Category = "Patching",
+        Value = true,
+    },
 
     WriteToLogs = {
         Name = "Write To Logs File patched/logs.txt (in save directory) WILL CAUSE MAJOR PERFORMANCE HITS",

@@ -2,7 +2,7 @@
 local methods = {}
 
 local fileHandler = require("EmbeddedModLoader/fileManagerHelper/fileManager")
-
+local configPatcher = require("EmbeddedModLoader/injecting/configPatching/configPatcher")
 
 -- search the mods in all possible mod directories
 
@@ -73,6 +73,11 @@ for _, directory in pairs(modDirectories) do
     -- meaning that for months you couldnt disable a mod at all LOL
     if modsFolder['.lovelyignore'] then
         goto skipFolder
+    end
+
+    -- json patching
+    if _G.MenuSettings.ConfigPatching.Value == true then
+        configPatcher.search(directory, modsFolder)
     end
 
     for _, mod in pairs( fileHandler.exploreFolder(path, method) ) do

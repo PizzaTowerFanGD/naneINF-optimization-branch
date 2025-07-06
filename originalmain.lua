@@ -78,8 +78,7 @@ function love.run()
 		end
 
 		run_time = math.min(love.timer.getTime() - run_time, 0.1)
-        p_ww, p_hh, p_wflags = love.window.getMode()
-        G.FPS_CAP = p_wflags['refreshrate']
+		G.FPS_CAP = G.FPS_CAP or 500
 		if run_time < 1./G.FPS_CAP then love.timer.sleep(1./G.FPS_CAP - run_time) end
 	end
 end
@@ -87,8 +86,7 @@ end
 function love.load() 
 	G:start_up()
 	--Steam integration
-    local os = love.system.getOS()
-    love.window.setMode(2, 1, {highdpi = true})
+	local os = love.system.getOS()
 	if os == 'OS X' or os == 'Windows' then 
 		local st = nil
 		--To control when steam communication happens, make sure to send updates to steam as little as possible

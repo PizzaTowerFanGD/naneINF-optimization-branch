@@ -70,7 +70,7 @@ local function collectMods()
 
         if love.filesystem.getInfo(modPath .. '/' .. 'version.lua') then
             local succ, err = pcall(function()
-                version, error = load(love.filesystem.read(modPath .. '/' .. 'version.lua'))()
+                version, errro = load(love.filesystem.read(modPath .. '/' .. 'version.lua'))()
             end)
 
             if succ then

@@ -11,7 +11,7 @@ end
 
 function Regex.new(patternStr, flags, source)
 
-    print("NEWREGEX: ", patternStr, flags)
+    --print("NEWREGEX: ", patternStr, flags)
 
     local pattern = RegModule.new(patternStr, flags)
 
@@ -82,7 +82,16 @@ function Regex.new(patternStr, flags, source)
             end
 
             function methods.getValue()
-                return groupsArr[gId]
+                if not gId then
+                    print("gId IS NULL??? DEFAULTING VALUE TO NOTHING.")
+                    return ""
+                end
+
+                if not groupsArr[gId] then
+                    print("GET VALUE FOR REGEX $" .. gId .. "   DOES NOT EXIST, DEFALTED TO \"\" ")
+                end
+
+                return groupsArr[gId] --or ""
             end
 
 

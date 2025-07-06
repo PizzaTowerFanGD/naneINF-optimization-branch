@@ -21,6 +21,9 @@ local function print(...)
     return forcePrint(...)
 end
 
+local debugEvenMore = true
+
+
 local function split(str, splitby)
     local splits = {""}
     local newIndex = 1
@@ -106,11 +109,11 @@ end
 
 
 -- debug log config
-local logIfPercentageFound = 0.8
+local logIfPercentageFound = 0--0.2
 
 
 -- i would just normally do ==, but wildcards make this necessary.
-local function compareStrings(pattern, line, hasTag)
+local function compareStrings(pattern, line, hasTag, longest)
     --print(pattern, line)
 
     -- optimization
@@ -126,7 +129,7 @@ local function compareStrings(pattern, line, hasTag)
         -- no chance to match.
         if hasTag and patternLength/#line >= logIfPercentageFound then
             forcePrint("-----------------------------\n[LUAVELY]: PATTERN TAG DBG, PATTERN: " .. pattern .. " :: WITH TAG " .. hasTag .. ":: HAS NO CHANCE TO MATCH.\n" ..
-                    "LENGTH OF PATTERN: " .. patternLength .. "   LENGTH OF LINE: " .. #line .. "\n\n")
+                    "LENGTH OF PATTERN: " .. patternLength .. "   LENGTH OF LINE: " .. #line .. "\n\n" .. "Expected: " .. pattern .. "\n" .. "Line: " .. line .. "\n\n")
         end
 
         return false
@@ -150,7 +153,7 @@ local function compareStrings(pattern, line, hasTag)
         if patternChr ~= lineChr then
             if hasTag and i/patternLength >= logIfPercentageFound then
                 forcePrint("-----------------------------\n" ..
-                        "[LUAVELY]: PATTERN TAG DBG, LETTER MISMATCH ON: " .. pattern .. " :: WITH TAG " .. hasTag .. ":: ON INDEX " .. i .. "/" .. patternLength .. "\n"
+                        "[LUAVELY]: PATTERN TAG DBG, LETTER MISMATCH ON: " .. pattern .. "\n :: FOR LINE " .. line .. "\n" .. " :: WITH TAG " .. hasTag .. ":: ON INDEX " .. i .. "/" .. patternLength .. "\n"
                 .. "FOUND: " .. lineChr .. ",    LOOKING FOR: " .. patternChr .. "\n\n"
                 )
             end
@@ -174,9 +177,14 @@ end
 -- originally i checked EVERY SINGLE CHARACTER, but thankfully we dont need to do that anymore yipe!!!
 
 
-local function match(lines, times, patternLines, tag)
+local function match(lines, times, patternLines, tag, storeLongest)
     local currentLine = 1
     local matches = {}
+
+
+    local longestLen
+    local longestSTR
+
 
     -- start searching
     for i, line in ipairs(lines) do
@@ -184,16 +192,30 @@ local function match(lines, times, patternLines, tag)
         --print(patternLines)
         local patternLine = patternLines[currentLine][2]
 
+        if tag then
+            forcePrint("ForcePrintingLine[2]: " .. line[2])
+        end
+
         -- just assume these are a match and continue
         if patternLine == '' then
             currentLine = currentLine + 1
+            if tag then
+                forcePrint("Empty line skip")
+            end
+
             goto matchingContinue
         end
+
+
 
         -- was not a match with wildcard or regular :(
         if not compareStrings(patternLine, line[2], tag) then
             --print('fail')
             currentLine = 1
+
+            if tag then
+                forcePrint("Failed to match!!!!")
+            end
             goto matchingContinue
         end
 
@@ -205,11 +227,20 @@ local function match(lines, times, patternLines, tag)
                 start = i - (currentLine-1),
                 ['end'] = i
             })
+            if tag then
+                forcePrint("Match found currentLine >= #patternLines")
+            end
 
             currentLine = 1
         else
+            if tag then
+                forcePrint("Match found currentLine = currentLine + 1")
+            end
 
             currentLine = currentLine + 1
+        end
+        if tag then
+            forcePrint("Match ::matchingContinue::")
         end
 
         ::matchingContinue::
@@ -219,7 +250,8 @@ local function match(lines, times, patternLines, tag)
     local truncatedMatches = {}
 
     if #matches > (times or 1) then --(times or math.huge)
-        forcePrint('[LuaVELY]: Matches exceeds the set times limit, All Extra matches have been truncated in order from greatest -> least (truncated greatest first.')
+        forcePrint([[[--------------------------------------------------------------------------------------
+        [LuaVELY PATTERN]: Matches exceeds the set times limit, All Extra matches have been truncated in order from greatest -> least (truncated greatest first.')]], "PATCHING")
 
         for i, v in ipairs(matches) do
             if i > times then
@@ -250,13 +282,15 @@ end
 
 
 
+-- more debug
+
 
 
 function methods:apply(target, patch)
     -- // important
 
     local file = faker.RequestDynamicFile(target)
-    if not file then forcePrint("No file target found.") return end
+    if not file then forcePrint("No file target found.", "PATCHING") return end
 
 
     local lines = linesTrimmed(file.getSource())
@@ -275,7 +309,7 @@ function methods:apply(target, patch)
 
 
     -- start searching
-    local matches = match(lines, times, patternDeconst, patch.tag)
+    local matches, longest = match(lines, times, patternDeconst, patch.tag, debugEvenMore)
 
     --print(matches)
 
@@ -283,7 +317,11 @@ function methods:apply(target, patch)
 
     -- improving professionality :broken_heart:
     if #matches == 0 then
-        forcePrint("[LuaVELY]: No Matches Found For: \"\"\"" .. pattern .. "\"\"\"  in Source: " .. tostring(target) .. ".")
+        forcePrint("---------------------------------------------------------------\n"
+                .. "[LuaVELY PATTERN]: No Matches Found For: \"\"\"" .. pattern .. "\"\"\" \n-----------------------------------------------\n"
+                .. "with Payload: \"\"\"" .. payload .. "\"\"\" \n----------------------------\n in Source: " .. tostring(target) .. "." .. "\n--------------------------------------------------\n" ..
+                "The longest match: " .. (longest or 'nil') .. "\n---------------------------------------------------------------\n\n\n\n",
+                "PATCHING")
         return
     end
 

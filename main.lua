@@ -56,7 +56,8 @@ end
 
 
 function error(...)
-    return forcePrint(...)
+    forcePrint(...)
+    return error(...)
 end
 
 

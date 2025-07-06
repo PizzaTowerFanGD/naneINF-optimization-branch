@@ -16,7 +16,7 @@ function method:apply(target, patch, file)
         target = (patch.__PATH or "mods/smods/") .. target
 
 
-        forcePrint("COPY PATCH FUNCTION RUNNED YIPE!! " .. ogTarget .. " : " .. target)
+        forcePrint("COPY PATCH FUNCTION RUNNED YIPE!! " .. ogTarget .. " : " .. target, "PATCHING")
 
         -- overwrite main.lua to go to originalmain so we dont overwrite the actual loader
 

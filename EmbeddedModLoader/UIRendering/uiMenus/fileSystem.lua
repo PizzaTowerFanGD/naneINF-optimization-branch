@@ -85,7 +85,7 @@ local function addPathButton(text, icon, x, y, height, add)
     local textSize = love.graphics.getHeight()/1440 * 48
     local textObject = love.graphics.newText(love.graphics.newFont("resources/fonts/m6x11plus.ttf", textSize), text)
 
-    forcePrint(add)
+    --forcePrint(add)
 
     local button = library:addButton({
         x = x + textObject:getWidth()/2560 + add,

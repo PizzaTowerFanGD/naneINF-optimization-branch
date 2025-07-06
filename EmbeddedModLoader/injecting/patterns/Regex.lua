@@ -76,14 +76,16 @@ local function findAndReplaceGroupRequests(payload, patch, matches)
             -- save and stop recoridng
             if not isAlphabeticCharacter(chr) or (i == #payload) then
                 recording = false
+
                 --activeRecording.span['end'] = i
                 if i == #payload and isAlphabeticCharacter(chr) then
                     activeRecording.name = activeRecording.name .. chr
                 end
+                --print("stop: " .. activeRecording.name)
 
                 -- sometimes we actually use $ for things which arent captures, like the for the money symbol in a string LOL
 
-                if recordingLength > 0 then
+                if recordingLength > 0 or i == #payload then
                     table.insert(savedRecordingData, activeRecording)
                 end
 
@@ -103,6 +105,7 @@ local function findAndReplaceGroupRequests(payload, patch, matches)
 
         -- not recording yet
         if chr == "$" then
+            --print("start")
             recordingLength = 0
 
             recording = true
@@ -118,7 +121,7 @@ local function findAndReplaceGroupRequests(payload, patch, matches)
 
     -- inject the group requests (??? WHAT ARE THEY CALLED!??!?) to the payload :D
     for _, data in pairs(savedRecordingData) do
-        payload = string.gsub(payload, "$" .. data.name, matches.get_group(data.name).getValue())
+        payload = string.gsub(payload, "$" .. data.name, matches.get_group(data.name).getValue() or "") -- 7/5/25 patch, if no group is found it should default to nothing.
     end
 
     --sleep(0.0000000000000001)
@@ -151,13 +154,18 @@ function module:apply(patch)
     local source = file.getSource()
 
     -- regex for finding the pattern
-    forcePrint(patch.pattern)
-    forcePrint("m")
+    --forcePrint(patch.pattern)
+    --forcePrint("m")
 
     local newRe = regex.new(patch.pattern, "m", source) --.. (patch.verbose and 'x' or '')
 
     if #newRe <= 0 then
-        oldprint("REGEX: NO MATCHES FOUND FOR: " .. patch.pattern .. "       IN    " .. patch.target .. "   !!!!!!!!!")
+        forcePrint("---------------------------------------------------------------\n"
+                .. "[LuaVELY REGEX]: No Matches Found For: \"\"\"" .. patch.pattern .. "\"\"\" \n-----------------------------------------------\n"
+                .. "with Payload: \"\"\"" .. patch.payload .. "\"\"\" \n----------------------------\n in Source: " .. tostring(patch.target) .. "." .. "\n---------------------------------------------------------------\n",
+                "PATCHING")
+
+        --forcePrint("REGEX: NO MATCHES FOUND FOR: " .. patch.pattern .. "       IN    " .. patch.target .. "   !!!!!!!!!", "PATCHING")
         return
     end
 

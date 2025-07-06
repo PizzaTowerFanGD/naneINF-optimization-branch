@@ -4,7 +4,6 @@ local inject = {}
 local fileManagerThing = require("EmbeddedModLoader/fileManagerHelper/fileManager")
 
 
-
 function sleep(n)
     if n > 0 then os.execute("ping -n " .. tonumber(n+1) .. " localhost > NUL") end
 end
@@ -165,10 +164,13 @@ function inject.sort(tomlFiles)
         loopInsert('module', list, patches, data, priority)
     end
 
+    -- fix on 7/5/2025
+    -- pattern and regex go at the same time, if the patches priorites are tied then pattern always goes first.
+
     local loadOrders = {
         manifest = 0,
-        pattern = 1,
-        regex = 2,
+        pattern = 1,  -- 1
+        regex = 1.1,  -- 2
         copy = 3,
         module = 4
     }
@@ -190,8 +192,15 @@ function inject.sort(tomlFiles)
             test2 = loadOrders[b.PATCH_TYPE] or 0
 
             -- now we sort by local/order priorities, which is essential for many mods to load.
-            if test1 == test2 then
-                return a.__LOCAL_ORDER_PRIORITY < b.__LOCAL_ORDER_PRIORITY
+            --7/5/25
+            --if test1 == test2 then
+
+            if math.floor(test1) == math.floor(test2) then
+                if a.__PRIORITY == b.__PRIORITY and test1 ~= test2 then
+                    return test1 < test2
+                end
+
+                return a.__PRIORITY < b.__PRIORITY -- CHANGE ON 7/5/2025 SEE IF THIS WASTHE FIX,    ORIGINAL: ---- >>>>>        a.__LOCAL_ORDER_PRIORITY < b.__LOCAL_ORDER_PRIORITY
             end
 
             return test1 < test2--(a.__PRIORITY or -999999) < (b.__PRIORITY or -999999)  --test1 < test2
@@ -200,7 +209,9 @@ function inject.sort(tomlFiles)
 
     for i, v in pairs(list) do
         for ind, patch in ipairs(v) do
-            forcePrint("AFTERSORT: " .. ind .. " : " .. patch.__NAME)
+            --forcePrint("AFTERSORT: " .. ind .. " : " .. patch.__NAME)
+            forcePrint("AFTERSORT: " .. ind .. " :::  NAME: " .. patch.__NAME .. "   :::  PRIORITY: " .. patch.__PRIORITY .. "\n LOCAL PRIORITY: " .. patch.__LOCAL_ORDER_PRIORITY .. "    :::    TYPE: " ..  loadOrders[patch.PATCH_TYPE])
+            forcePrint(" --------------- ")
         end
     end
 
@@ -272,7 +283,7 @@ function writeToFile(...)
 end
 
 -- forces a print
-function forcePrint(str)
+function forcePrint(str, prefix)
     if not str then
         str = 'nil'
     end
