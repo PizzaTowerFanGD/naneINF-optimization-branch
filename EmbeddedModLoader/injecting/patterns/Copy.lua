@@ -13,7 +13,7 @@ function method:apply(target, patch, file)
     local contents = file.getSource()
 
     for _, target in pairs(patch.sources) do
-        target = (patch.__PATH or "mods/smods/") .. target
+        target = (patch.__PATH or "Mods/smods/") .. target
 
 
         forcePrint("COPY PATCH FUNCTION RUNNED YIPE!! " .. ogTarget .. " : " .. target, "PATCHING")

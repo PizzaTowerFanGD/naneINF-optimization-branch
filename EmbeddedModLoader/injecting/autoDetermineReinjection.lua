@@ -62,8 +62,8 @@ local function collectMods()
     local returnTable = {}
     local modCount = 0
 
-    for _, folderName in pairs(love.filesystem.getDirectoryItems('mods')) do
-        local modPath = 'mods/' .. folderName
+    for _, folderName in pairs(love.filesystem.getDirectoryItems('Mods')) do
+        local modPath = 'Mods/' .. folderName
         local nameToReturn = modPath
 
         local dirInfo = (love.filesystem.getInfo(modPath) or {})

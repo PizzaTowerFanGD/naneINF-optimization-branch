@@ -17,7 +17,7 @@ local function readAndParseTOML(lovelyFile, type)
     end]]
 
     -- there is a chance where the file might not have a manifest, so provide a dummy manifest
-    if lovelyFile == 'mods/Talisman/lovely.toml' then
+    if lovelyFile == 'Mods/Talisman/lovely.toml' then
         forcePrint("LOVELY FILE TALISMAN MANIFSEST: " .. tostring(parsedTomlFile.manifest))
     end
     parsedTomlFile.manifest = parsedTomlFile.manifest or {
@@ -46,7 +46,7 @@ local function readAndParseTOML(lovelyFile, type)
             break
         end
 
-        if not cutoff and rootPath == 'mods/' then
+        if not cutoff and rootPath == 'Mods/' then
             cutoff = true
         end
     end

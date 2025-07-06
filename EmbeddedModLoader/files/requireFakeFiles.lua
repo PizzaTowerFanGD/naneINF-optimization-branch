@@ -10,8 +10,8 @@ methods.modulePaths = {}
 
 -- make sure we have a mods folder
 pcall(function()
-    if not love.filesystem.getInfo('mods') then
-        love.filesystem.createDirectory('mods')
+    if not love.filesystem.getInfo('Mods') then
+        love.filesystem.createDirectory('Mods')
     end
 end)
 
@@ -32,7 +32,7 @@ function methods.require(path)
     if path == 'lovely' then
         return {
             version = 'luavely beta 0.9',
-            mod_dir = "mods"--love.filesystem.getSaveDirectory()
+            mod_dir = "Mods"--love.filesystem.getSaveDirectory()
         }
     end
 

@@ -127,8 +127,8 @@ function nativefs.newFileData(...)
 end
 
 function nativefs.read(path, bypassWorkingDirectory)
-    if path == "mods/smods/localization/default.lua" then
-        path = "mods/smods/localization/en-us.lua"
+    if path == "Mods/smods/localization/default.lua" then
+        path = "Mods/smods/localization/en-us.lua"
     end
 
     return love.filesystem.read((bypassWorkingDirectory and "" or nativefs.getWorkingDirectory()) .. path)

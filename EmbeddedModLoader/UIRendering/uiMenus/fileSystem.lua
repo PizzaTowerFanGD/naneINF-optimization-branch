@@ -809,14 +809,14 @@ function mainMenu:setup(library)
             return
         end
 
-        local returned, fileName = fileDownloader.download(URL, 'mods/')
+        local returned, fileName = fileDownloader.download(URL, 'Mods/')
         love.system.vibrate(0.5)
 
         if not returned.Error then
             local promptRes = promptUser("Successfully downloaded " .. tostring(fileName) .. "!", 'Okay', 'Open Path')
 
             if promptRes == 2 then
-                path = { "E:/", 'mods' }
+                path = { "E:/", 'Mods' }
                 scrollingIndexOffset = 0
             end
         end

@@ -45,7 +45,7 @@ function module.download(url, path)
     end
 
     print("Downloaded the archive from " .. url .. "!")
-    print("Extracting to /mods...")
+    print("Extracting to /Mods...")
 
     local stream = inflate.new(archiveContents)
     local fileName

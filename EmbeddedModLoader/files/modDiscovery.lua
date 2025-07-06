@@ -16,7 +16,7 @@ end
 local modDirectories = {}
 
 local saveDirectory = love.filesystem.getSaveDirectory()
-local hardWrittenMods = "mods"
+local hardWrittenMods = "Mods"
 
 -- check OS and insert directories
 local osName = love.system.getOS()
@@ -35,20 +35,20 @@ table.insert(modDirectories, {"L", hardWrittenMods}) -- bundled inside the exe/.
 -- check if there is a mods folder in the save directory, if not we will in the future attempt to create one
 -- and prompt the user to make one if it fails.
 
-local saveDirModsFolder = love.filesystem.getInfo(saveDirectory .. "/mods")
+local saveDirModsFolder = love.filesystem.getInfo(saveDirectory .. "/Mods")
 
 -- no mods folder exists, make one
 if saveDirModsFolder == nil then
     local success, err = pcall(function()
-        love.filesystem.createDirectory(saveDirectory .. "/mods")
+        love.filesystem.createDirectory(saveDirectory .. "/Mods")
         table.insert(modDirectories, {"L", saveDirectory})
     end)
 
-    print("No mods folder in the save directory (" .. saveDirectory .. "/mods) was found. ")
+    print("No mods folder in the save directory (" .. saveDirectory .. "/Mods) was found. ")
     if not success then
-        print("Attempt to create a mods folder in the save directory failed. Reason: " .. err)
+        print("Attempt to create a Mods folder in the save directory failed. Reason: " .. err)
     else
-        print("Successfully created a mods folder in your save directory!")
+        print("Successfully created a Mods folder in your save directory!")
     end
 else
     table.insert(modDirectories, {"L", saveDirectory})
@@ -71,7 +71,7 @@ for _, directory in pairs(modDirectories) do
 
     -- 5/8/2025, ive entirely forgot that this feature in lovely existed.
     -- meaning that for months you couldnt disable a mod at all LOL
-    if modsFolder['.lovelyignore'] then
+    if modsFolder['.lovelyignore'] or modsFolder['/.lovelyignore'] or modsFolder[path .. '/.lovelyignore'] then
         goto skipFolder
     end
 
