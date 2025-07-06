@@ -64,7 +64,7 @@ function methods.require(path)
         --error(error_ or err)
 
         forcePrint(error_ or err)
-        --loadedRequires[path] = oldRequire(path)
+        loadedRequires[path] = oldRequire(path)
     end
 
     loadedRequires[path] = chunk
