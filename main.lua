@@ -50,7 +50,10 @@ function writeToFile(...)
 
     if not _G.MenuSettings then return end
     if _G.MenuSettings.WriteToLogs.Value then
-        love.filesystem.write("patched/".. _G.CurrentLog .. "logs.txt", love.filesystem.read("patched/".. _G.CurrentLog .. "logs.txt") .. "\n" .. tostring(v1))
+        love.filesystem.write("patched/".. tostring(_G.CurrentLog or "_NO_LOG_ERROR_") .. "logs.txt",
+                (love.filesystem.read("patched/".. tostring(_G.CurrentLog or "_NO_LOG_ERROR_") .. "logs.txt") or "")
+                .. "\n" .. tostring(v1 or "NIL")
+        )
     end
 end
 

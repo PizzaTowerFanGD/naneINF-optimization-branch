@@ -107,6 +107,12 @@ local defaultSettings = {
         Value = true
     },
 
+    LowPerformanceMode = {
+        Name = "Low Performance Mode [SLOW]",
+        Category = "Optimization",
+        Value = false
+    },
+
     -- no longer in use as LoadUsingMultiThreading is now forced
     --[[LoadUsingMultiThreading = {
         Name = "Load Using Multi-Threading [WIP]",
@@ -121,11 +127,11 @@ local defaultSettings = {
         Value = true
     },]]
 
-    ConfigPatching = {
+    --[[ConfigPatching = {
         Name = "Automatically Patch Mod Config Files",
         Category = "Patching",
         Value = true,
-    },
+    },]]
 
     WriteToLogs = {
         Name = "Write To Logs File patched/logs.txt (in save directory) WILL CAUSE MAJOR PERFORMANCE HITS",

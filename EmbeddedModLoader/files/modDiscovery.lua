@@ -76,9 +76,10 @@ for _, directory in pairs(modDirectories) do
     end
 
     -- json patching
-    if _G.MenuSettings.ConfigPatching.Value == true then
-        configPatcher.search(directory, modsFolder)
-    end
+    --TODO: REMASTER SETTINGS GUI AND REINTRODUCE THIS SETTING
+    --if _G.MenuSettings.ConfigPatching.Value == true then
+        --configPatcher.search(directory, modsFolder)
+    --end
 
     for _, mod in pairs( fileHandler.exploreFolder(path, method) ) do
         table.insert(mods, {method, mod})

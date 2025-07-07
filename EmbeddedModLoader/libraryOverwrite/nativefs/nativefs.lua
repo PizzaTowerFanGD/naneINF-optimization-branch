@@ -32,7 +32,7 @@ function print(...)
         return
     end
 
-    love.filesystem.write("patched/".. _G.CurrentLog .. "logs.txt", love.filesystem.read("patched/".. _G.CurrentLog .. "logs.txt") .. "\n" .. tostring(v1))
+    love.filesystem.write("patched/".. _G.CurrentLog .. "logs.txt", (love.filesystem.read("patched/".. _G.CurrentLog .. "logs.txt") or '') .. "\n" .. tostring(v1))
 
     return originalPRINT(...)
 end

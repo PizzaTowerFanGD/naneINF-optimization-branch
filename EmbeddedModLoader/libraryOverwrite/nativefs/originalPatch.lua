@@ -32,7 +32,7 @@ function print(...)
         return
     end
 
-    love.filesystem.write("patched/".. _G.CurrentLog .. "logs.txt", love.filesystem.read("patched/".. _G.CurrentLog .. "logs.txt") .. "\n" .. tostring(v1))
+    love.filesystem.write("patched/".. _G.CurrentLog .. "logs.txt", (love.filesystem.read("patched/".. _G.CurrentLog .. "logs.txt") or "") .. "\n" .. tostring(v1))
 
     return originalPRINT(...)
 end
@@ -78,21 +78,20 @@ function nativefs.setWorkingDirectory(directory)
 
     print("setWorkingDirectory: " .. tostring(directory))
 
-print("Save Die: " .. tostring(love.filesystem.getSaveDirectory()))
+    print("Save Die: " .. tostring(love.filesystem.getSaveDirectory()))
 
 
     directory = string.gsub(directory, love.filesystem.getSaveDirectory(), "")
 
 
-print("setcheck1: " .. tostring(#directory >= #love.filesystem.getSaveDirectory())
-)
+    print("setcheck1: " .. tostring(#directory >= #love.filesystem.getSaveDirectory()))
 
-print("setcheck2: " .. string.sub(directory, 1, #love.filesystem.getSaveDirectory()))
+    print("setcheck2: " .. string.sub(directory, 1, #love.filesystem.getSaveDirectory()))
 
     if #directory >= #love.filesystem.getSaveDirectory() and string.sub(directory, 1, #love.filesystem.getSaveDirectory()) ==  love.filesystem.getSaveDirectory() then
-    directory = string.sub(#love.filesystem.getSaveDirectory()+1, #directory)
+        directory = string.sub(#love.filesystem.getSaveDirectory()+1, #directory)
 
-print("SUBSTRING FIX METHOD")
+        print("SUBSTRING FIX METHOD")
 
     end
 

@@ -113,6 +113,7 @@ local lowestOffset = math.huge
 -- start script injecting
 -- multithreading is now forced (absolutely no reason to not use it)
 local injecting = require("EmbeddedModLoader/injecting/inject") --(_G.MenuSettings.LoadUsingMultiThreading.Value and '/WIP_threading' or '') .. "/inject")
+local injectingSlowLow = require("EmbeddedModLoader/injecting/injectLowPerf") --(_G.MenuSettings.LoadUsingMultiThreading.Value and '/WIP_threading' or '') .. "/inject")
 
 
 
@@ -160,7 +161,13 @@ end]]
 -- now that these are fixed it should be safe to inject
 
 luavely.lovelyTomlFiles = lovelyTomlFiles
-injecting.start(lovelyTomlFiles)
+
+-- TODO: Refactor the code so that these arent two copies of the same file with a minute difference
+if _G.MenuSettings.LowPerformanceMode.Value then
+    injectingSlowLow.start(lovelyTomlFiles)
+else
+    injecting.start(lovelyTomlFiles)
+end
 
 
 return luavely
