@@ -39,7 +39,6 @@ local function split(str)
     return tab
 end
 
-
 -- a very unfortunate method
 
 local function Exists(path, target)

@@ -562,7 +562,7 @@ function modLoader.mousepressed(x, y, ...)
     -- check if we pushed a button
     for i, button in ipairs(modLoader.Buttons) do
         if button.whitelisted == true then
-            print('canrun')
+            --print('canrun')
         end
         if modLoader.blacklistEnabled and not button.whitelisted then
             goto continue

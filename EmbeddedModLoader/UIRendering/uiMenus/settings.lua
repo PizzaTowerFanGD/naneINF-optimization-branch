@@ -139,6 +139,18 @@ local defaultSettings = {
         Value = false
     },
 
+    ShaderPatchingEnabled = {
+        Name = "Automatically Patch Shaders",
+        Category = "Patching",
+        Value = true
+    },
+
+    ConfigPatching = {
+        Name = "Automatically Patch Config Files",
+        Category = "Patching",
+        Value = true
+    },
+
     AlwaysPromptModsEnabled = {
         Name = "Ask Before Loading Mods",
         Category = "General",
@@ -156,6 +168,8 @@ local defaultSettings = {
         Category = "General",
         Value = false,
     },
+
+
 
     ModsEnabled = {
         Name = "Mods Enabled",
@@ -285,7 +299,7 @@ function mainMenu:setup(library)
                 assets.delete,
 
                 toScaleFromPixels(1920/2, 1920),
-                toScaleFromPixels(100 + (index*125), 1080),
+                toScaleFromPixels(-20 + (index*125), 1080),
                 toScaleFromPixels(1920 - 100, 1920),
                 toScaleFromPixels(100, 1080),
 

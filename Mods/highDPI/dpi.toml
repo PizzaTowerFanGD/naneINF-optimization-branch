@@ -1,0 +1,11 @@
+# Back:change_to()
+[[patches]]
+[patches.pattern]
+target = 'main.lua'
+pattern = "-- We don't want the first frame's dt to include time taken by love.load."
+position = 'before'
+match_indent = true
+payload = """love.window.setMode(0, 0, {
+    highdpi = true,
+    usedpiscale = true
+})"""

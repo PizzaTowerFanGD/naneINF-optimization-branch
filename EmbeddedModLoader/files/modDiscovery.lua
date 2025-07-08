@@ -3,6 +3,7 @@ local methods = {}
 
 local fileHandler = require("EmbeddedModLoader/fileManagerHelper/fileManager")
 local configPatcher = require("EmbeddedModLoader/injecting/configPatching/configPatcher")
+local shaderPatcher = require("EmbeddedModLoader/injecting/shaders/shaderPatch")
 
 -- search the mods in all possible mod directories
 
@@ -62,6 +63,36 @@ local texturePacks = {}
 
 
 
+local function patchShaders(path)
+    if not _G.MenuSettings.ShaderPatchingEnabled.Value then
+        return
+    end
+
+    local modsContents = fileHandler.exploreFolderForNames(path, "L")
+    if not modsContents['assets'] then
+        for i, v in pairs(modsContents) do
+            print(i)
+        end
+
+        return
+    end
+
+    local assetsContents = fileHandler.exploreFolderForNames(path .. "/assets", "L")
+    if not assetsContents['shaders'] then
+        return
+    end
+
+    -- shaders exist, get all shaders in the folder and run the patcher.
+    local shadersInFolder = fileHandler.exploreFolderForNames(path .. "/assets/shaders", "L")
+
+    -- patch them all.
+    for i, v in pairs(shadersInFolder) do
+        shaderPatcher.convert(path .. "/assets/shaders/" .. i)
+    end
+end
+
+
+
 -- "L" : love.filesystem, "I" : io
 for _, directory in pairs(modDirectories) do
     local method = directory[1]
@@ -69,11 +100,6 @@ for _, directory in pairs(modDirectories) do
 
     local modsFolder = fileHandler.exploreFolder(path, method)
 
-    -- 5/8/2025, ive entirely forgot that this feature in lovely existed.
-    -- meaning that for months you couldnt disable a mod at all LOL
-    if modsFolder['.lovelyignore'] or modsFolder['/.lovelyignore'] or modsFolder[path .. '/.lovelyignore'] then
-        goto skipFolder
-    end
 
     -- json patching
     --TODO: REMASTER SETTINGS GUI AND REINTRODUCE THIS SETTING
@@ -82,12 +108,22 @@ for _, directory in pairs(modDirectories) do
     --end
 
     for _, mod in pairs( fileHandler.exploreFolder(path, method) ) do
+        if love.filesystem.getInfo(mod .. "/" .. '.lovelyignore') then
+            print("SKIP MOD")
+            goto skipMod
+        end
+
         table.insert(mods, {method, mod})
+
+        if _G.MenuSettings.ConfigPatching.Value == true then
+            configPatcher.search(mod)
+        end
+
+        patchShaders(mod, modsFolder)
+
+        :: skipMod ::
     end
-
-    :: skipFolder ::
 end
-
 
 methods.mods = mods
 

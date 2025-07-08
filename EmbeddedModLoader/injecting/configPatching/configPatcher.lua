@@ -1,7 +1,13 @@
 local methods = {}
 local json = require("EmbeddedModLoader/libraries/json/json")
+local fileHandler = require("EmbeddedModLoader/fileManagerHelper/fileManager")
 
-function methods.search(directory, modsFolder)
+
+function methods.search(directory)
+    local modsFolder = fileHandler.exploreFolderForNames(directory, "L")
+
+    print("CFG PATCHING " .. directory)
+
     for name, _ in pairs(modsFolder) do
         if not string.find(name, ".json") then
             goto continue
