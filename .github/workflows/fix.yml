@@ -1,0 +1,43 @@
+name: normalize-assets
+
+on:
+  push:
+    paths:
+      - "EmbeddedModLoader/assets/**"
+  pull_request:
+    paths:
+      - "EmbeddedModLoader/assets/**"
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick ffmpeg
+
+      - name: resize images
+        run: |
+          find EmbeddedModLoader/assets -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.gif" -o -iname "*.webp" \) \
+            -exec mogrify -resize x250\> {} \;
+
+      - name: resample audio
+        run: |
+          find EmbeddedModLoader/assets -type f \( -iname "*.wav" -o -iname "*.mp3" -o -iname "*.ogg" -o -iname "*.flac" \) | while read f; do
+            ffmpeg -y -i "$f" -ar 44100 "tmp.$$"
+            mv "tmp.$$" "$f"
+          done
+
+      - name: commit changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions"
+            git config user.email "actions@users.noreply.github.com"
+            git add EmbeddedModLoader/assets
+            git commit -m "normalize assets (images<=250px height, audio=44.1khz)"
+            git push
+          fi
