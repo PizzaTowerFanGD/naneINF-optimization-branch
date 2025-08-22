@@ -1,9 +1,6 @@
 name: normalize-assets
 
 on:
-  push:
-    paths:
-      - "EmbeddedModLoader/assets/**"
   pull_request:
     paths:
       - "EmbeddedModLoader/assets/**"
@@ -12,32 +9,34 @@ jobs:
   normalize:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: install deps
+      - name: install ffmpeg
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick ffmpeg
+          sudo apt-get install -y ffmpeg
 
-      - name: resize images
+      - name: normalize with ffmpeg
         run: |
-          find EmbeddedModLoader/assets -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.gif" -o -iname "*.webp" \) \
-            -exec mogrify -resize x250\> {} \;
-
-      - name: resample audio
-        run: |
-          find EmbeddedModLoader/assets -type f \( -iname "*.wav" -o -iname "*.mp3" -o -iname "*.ogg" -o -iname "*.flac" \) | while read f; do
-            ffmpeg -y -i "$f" -ar 44100 "tmp.$$"
-            mv "tmp.$$" "$f"
+          for f in $(find EmbeddedModLoader/assets -type f); do
+            ext="${f##*.}"
+            base="${f%.*}"
+            case "$ext" in
+              png|jpg|jpeg|gif|webp)
+                ffmpeg -y -i "$f" -vf "scale=-1:250:force_original_aspect_ratio=decrease" "${base}.tmp.$ext"
+                mv "${base}.tmp.$ext" "$f"
+                ;;
+              wav|mp3|ogg|flac)
+                ffmpeg -y -i "$f" -ar 44100 "${base}.tmp.$ext"
+                mv "${base}.tmp.$ext" "$f"
+                ;;
+            esac
           done
 
-      - name: commit changes
+      - name: check for diffs
         run: |
           if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions"
-            git config user.email "actions@users.noreply.github.com"
-            git add EmbeddedModLoader/assets
-            git commit -m "normalize assets (images<=250px height, audio=44.1khz)"
-            git push
+            echo "assets not normalized. run the pipeline locally or grab the artifact."
+            git status --short
+            exit 1
           fi
