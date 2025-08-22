@@ -1,9 +1,7 @@
 name: normalize-assets
 
 on:
-  pull_request:
-    paths:
-      - "EmbeddedModLoader/assets/**"
+  workflow_dispatch:
 
 jobs:
   normalize:
@@ -36,7 +34,7 @@ jobs:
       - name: check for diffs
         run: |
           if [ -n "$(git status --porcelain)" ]; then
-            echo "assets not normalized. run the pipeline locally or grab the artifact."
+            echo "assets not normalized. run completed, see changes below."
             git status --short
             exit 1
           fi
