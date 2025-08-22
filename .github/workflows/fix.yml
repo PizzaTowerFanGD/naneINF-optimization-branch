@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: install ffmpeg
         run: |
@@ -16,7 +18,7 @@ jobs:
 
       - name: normalize with ffmpeg
         run: |
-          for f in $(find EmbeddedModLoader/assets -type f); do
+          find EmbeddedModLoader/assets -type f | while IFS= read -r f; do
             ext="${f##*.}"
             base="${f%.*}"
             case "$ext" in
@@ -31,10 +33,12 @@ jobs:
             esac
           done
 
-      - name: check for diffs
+      - name: commit and push changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
-            echo "assets not normalized. run completed, see changes below."
-            git status --short
-            exit 1
+            git config user.name "github-actions"
+            git config user.email "actions@users.noreply.github.com"
+            git add EmbeddedModLoader/assets
+            git commit -m "normalize assets (images <=250px height, audio = 44.1kHz)"
+            git push
           fi
